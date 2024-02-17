@@ -1,0 +1,487 @@
+{
+    "stars": {
+        "ceph_gamma": [
+            110,
+            14
+        ],
+        "ceph_beta": [
+            87,
+            48
+        ],
+        "ceph_iota": [
+            64,
+            22
+        ],
+        "ceph_delta": [
+            33,
+            33
+        ],
+        "ceph_zeta": [
+            33,
+            43
+        ],
+        "ceph_mu": [
+            39,
+            56
+        ],
+        "ceph_alpha": [
+            59,
+            64
+        ],
+        "ceph_eta": [
+            63,
+            80
+        ],
+        "ceph_theta": [
+            71,
+            84
+        ],
+        "umin_1": [
+            158,
+            18
+        ],
+        "umin_2": [
+            157,
+            34
+        ],
+        "umin_3": [
+            160,
+            53
+        ],
+        "umin_4": [
+            174,
+            68
+        ],
+        "umin_5": [
+            192,
+            76
+        ],
+        "umin_6": [
+            188,
+            89
+        ],
+        "umin_7": [
+            168,
+            77
+        ],
+        "umaj_1": [
+            277,
+            136
+        ],
+        "umaj_2": [
+            269,
+            109
+        ],
+        "umaj_3": [
+            277,
+            92
+        ],
+        "umaj_4": [
+            283,
+            69
+        ],
+        "umaj_5": [
+            273,
+            28
+        ],
+        "umaj_6": [
+            295,
+            28
+        ],
+        "umaj_7": [
+            300,
+            62
+        ],
+        "dra_g": [
+            115,
+            170
+        ],
+        "dra_b": [
+            134,
+            170
+        ],
+        "dra_v": [
+            135,
+            158
+        ],
+        "dra_z": [
+            123,
+            149
+        ],
+        "dra_d": [
+            108,
+            94
+        ],
+        "dra_e": [
+            104,
+            77
+        ],
+        "dra_p": [
+            131,
+            90
+        ],
+        "dra_c": [
+            133,
+            84
+        ],
+        "dra_w": [
+            144,
+            107
+        ],
+        "dra_s": [
+            152,
+            119
+        ],
+        "dra_n": [
+            173,
+            135
+        ],
+        "dra_t": [
+            186,
+            145
+        ],
+        "dra_i": [
+            205,
+            138
+        ],
+        "dra_a": [
+            227,
+            98
+        ],
+        "dra_k": [
+            232,
+            56
+        ],
+        "dra_l": [
+            241,
+            36
+        ],
+        "cyg1": [
+            70,
+            148
+        ],
+        "cyg2": [
+            58,
+            145
+        ],
+        "cyg3": [
+            25,
+            126
+        ],
+        "OFFcyg3": [
+            6,
+            111
+        ],
+        "cyg4": [
+            26,
+            151
+        ],
+        "OFFcyg4": [
+            6,
+            141
+        ],
+        "bo_th": [
+            249,
+            145
+        ],
+        "bo_ka": [
+            256,
+            140
+        ],
+        "bo_la": [
+            269,
+            158
+        ],
+        "bo_ga": [
+            275,
+            185
+        ],
+        "OFFbo_1": [
+            257,
+            194
+        ],
+        "OFFbo_2": [
+            282,
+            194
+        ]
+    },
+    "links": [
+        [
+            "dra_g",
+            "dra_z"
+        ],
+        [
+            "dra_g",
+            "dra_b"
+        ],
+        [
+            "dra_b",
+            "dra_v"
+        ],
+        [
+            "dra_v",
+            "dra_z"
+        ],
+        [
+            "dra_z",
+            "dra_d"
+        ],
+        [
+            "dra_d",
+            "dra_e"
+        ],
+        [
+            "dra_d",
+            "dra_p"
+        ],
+        [
+            "dra_p",
+            "dra_c"
+        ],
+        [
+            "dra_p",
+            "dra_w"
+        ],
+        [
+            "dra_w",
+            "dra_s"
+        ],
+        [
+            "dra_s",
+            "dra_n"
+        ],
+        [
+            "dra_n",
+            "dra_t"
+        ],
+        [
+            "dra_t",
+            "dra_i"
+        ],
+        [
+            "dra_i",
+            "dra_a"
+        ],
+        [
+            "dra_a",
+            "dra_k"
+        ],
+        [
+            "dra_k",
+            "dra_l"
+        ],
+        [
+            "ceph_gamma",
+            "ceph_iota"
+        ],
+        [
+            "ceph_gamma",
+            "ceph_beta"
+        ],
+        [
+            "ceph_iota",
+            "ceph_beta"
+        ],
+        [
+            "ceph_iota",
+            "ceph_delta"
+        ],
+        [
+            "ceph_delta",
+            "ceph_zeta"
+        ],
+        [
+            "ceph_zeta",
+            "ceph_mu"
+        ],
+        [
+            "ceph_mu",
+            "ceph_alpha"
+        ],
+        [
+            "ceph_beta",
+            "ceph_alpha"
+        ],
+        [
+            "ceph_alpha",
+            "ceph_eta"
+        ],
+        [
+            "ceph_eta",
+            "ceph_theta"
+        ],
+        [
+            "umin_1",
+            "umin_2"
+        ],
+        [
+            "umin_2",
+            "umin_3"
+        ],
+        [
+            "umin_3",
+            "umin_4"
+        ],
+        [
+            "umin_4",
+            "umin_5"
+        ],
+        [
+            "umin_5",
+            "umin_6"
+        ],
+        [
+            "umin_6",
+            "umin_7"
+        ],
+        [
+            "umin_4",
+            "umin_7"
+        ],
+        [
+            "umaj_1",
+            "umaj_2"
+        ],
+        [
+            "umaj_2",
+            "umaj_3"
+        ],
+        [
+            "umaj_3",
+            "umaj_4"
+        ],
+        [
+            "umaj_4",
+            "umaj_5"
+        ],
+        [
+            "umaj_5",
+            "umaj_6"
+        ],
+        [
+            "umaj_6",
+            "umaj_7"
+        ],
+        [
+            "umaj_4",
+            "umaj_7"
+        ],
+        [
+            "cyg1",
+            "cyg2"
+        ],
+        [
+            "cyg2",
+            "cyg3"
+        ],
+        [
+            "cyg3",
+            "OFFcyg3"
+        ],
+        [
+            "cyg2",
+            "cyg4"
+        ],
+        [
+            "cyg4",
+            "OFFcyg4"
+        ],
+        [
+            "bo_th",
+            "bo_ka"
+        ],
+        [
+            "bo_ka",
+            "bo_la"
+        ],
+        [
+            "bo_th",
+            "bo_la"
+        ],
+        [
+            "bo_la",
+            "bo_ga"
+        ],
+        [
+            "bo_ga",
+            "OFFbo_1"
+        ],
+        [
+            "bo_ga",
+            "OFFbo_2"
+        ]
+    ],
+    "annotations": [
+        [
+            "Draco",
+            157,
+            101
+        ],
+        [
+            "(Dragon)",
+            163,
+            110
+        ],
+        [
+            "Ursa",
+            177,
+            40
+        ],
+        [
+            "Minor",
+            177,
+            49
+        ],
+        [
+            "Polaris",
+            143,
+            7
+        ],
+        [
+            "Ursa",
+            294,
+            74
+        ],
+        [
+            "Major",
+            294,
+            83
+        ],
+        [
+            "Cepheus",
+            12,
+            9
+        ],
+        [
+            "Cygnus",
+            27,
+            108
+        ],
+        [
+            "Lyra",
+            43,
+            169
+        ],
+        [
+            "Hercules",
+            101,
+            185
+        ],
+        [
+            "Canes",
+            307,
+            148
+        ],
+        [
+            "Venatici",
+            307,
+            157
+        ],
+        [
+            "Bootes",
+            233,
+            177
+        ]
+    ],
+    "titles": []
+}

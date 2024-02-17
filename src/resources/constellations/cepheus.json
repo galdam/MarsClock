@@ -1,0 +1,495 @@
+{
+    "stars": {
+        "cass1": [
+            133,
+            120
+        ],
+        "cass2": [
+            131,
+            140
+        ],
+        "cass3": [
+            146,
+            149
+        ],
+        "cass4": [
+            143,
+            170
+        ],
+        "cass5": [
+            166,
+            169
+        ],
+        "ceph_gamma": [
+            204,
+            100
+        ],
+        "ceph_beta": [
+            243,
+            129
+        ],
+        "ceph_iota": [
+            211,
+            152
+        ],
+        "ceph_delta": [
+            221,
+            183
+        ],
+        "ceph_zeta": [
+            232,
+            186
+        ],
+        "ceph_mu": [
+            248,
+            180
+        ],
+        "ceph_alpha": [
+            257,
+            160
+        ],
+        "ceph_eta": [
+            275,
+            157
+        ],
+        "ceph_theta": [
+            279,
+            148
+        ],
+        "cam_1": [
+            177,
+            16
+        ],
+        "cam_2": [
+            142,
+            11
+        ],
+        "cam_alpha": [
+            122,
+            41
+        ],
+        "cam_gamma": [
+            144,
+            63
+        ],
+        "cam_3": [
+            120,
+            70
+        ],
+        "cam_4": [
+            101,
+            87
+        ],
+        "cam_beta": [
+            98,
+            35
+        ],
+        "cam_5": [
+            69,
+            38
+        ],
+        "umin_1": [
+            217,
+            50
+        ],
+        "umin_2": [
+            235,
+            53
+        ],
+        "umin_3": [
+            254,
+            52
+        ],
+        "umin_4": [
+            271,
+            39
+        ],
+        "umin_5": [
+            283,
+            20
+        ],
+        "umin_6": [
+            295,
+            25
+        ],
+        "umin_7": [
+            282,
+            45
+        ],
+        "d1": [
+            276,
+            113
+        ],
+        "d2": [
+            293,
+            111
+        ],
+        "OFFd2": [
+            326,
+            104
+        ],
+        "d3": [
+            285,
+            82
+        ],
+        "d4": [
+            292,
+            86
+        ],
+        "OFFd4": [
+            326,
+            65
+        ],
+        "OFFaur_1": [
+            1,
+            30
+        ],
+        "aur_1": [
+            17,
+            27
+        ],
+        "aur_2": [
+            39,
+            21
+        ],
+        "OFFaur_2": [
+            40,
+            1
+        ],
+        "OFFaur_3": [
+            78,
+            1
+        ],
+        "per_eta": [
+            96,
+            114
+        ],
+        "per_ga": [
+            83,
+            110
+        ],
+        "per_tau": [
+            82,
+            121
+        ],
+        "per_al": [
+            63,
+            103
+        ],
+        "per_io": [
+            65,
+            116
+        ],
+        "per_th": [
+            70,
+            135
+        ],
+        "per_phi": [
+            99,
+            173
+        ],
+        "per_ka": [
+            42,
+            123
+        ],
+        "per_be": [
+            24,
+            131
+        ],
+        "per_rho": [
+            15,
+            137
+        ],
+        "per_ep": [
+            12,
+            88
+        ],
+        "OFFper_ep": [
+            1,
+            88
+        ],
+        "per_psi": [
+            49,
+            93
+        ],
+        "per_mu": [
+            47,
+            74
+        ],
+        "per_la": [
+            55,
+            62
+        ]
+    },
+    "links": [
+        [
+            "cass1",
+            "cass2"
+        ],
+        [
+            "cass2",
+            "cass3"
+        ],
+        [
+            "cass3",
+            "cass4"
+        ],
+        [
+            "cass4",
+            "cass5"
+        ],
+        [
+            "ceph_gamma",
+            "ceph_iota"
+        ],
+        [
+            "ceph_gamma",
+            "ceph_beta"
+        ],
+        [
+            "ceph_iota",
+            "ceph_beta"
+        ],
+        [
+            "ceph_iota",
+            "ceph_delta"
+        ],
+        [
+            "ceph_delta",
+            "ceph_zeta"
+        ],
+        [
+            "ceph_zeta",
+            "ceph_mu"
+        ],
+        [
+            "ceph_mu",
+            "ceph_alpha"
+        ],
+        [
+            "ceph_beta",
+            "ceph_alpha"
+        ],
+        [
+            "ceph_alpha",
+            "ceph_eta"
+        ],
+        [
+            "ceph_eta",
+            "ceph_theta"
+        ],
+        [
+            "cam_1",
+            "cam_2"
+        ],
+        [
+            "cam_2",
+            "cam_alpha"
+        ],
+        [
+            "cam_alpha",
+            "cam_gamma"
+        ],
+        [
+            "cam_gamma",
+            "cam_3"
+        ],
+        [
+            "cam_3",
+            "cam_4"
+        ],
+        [
+            "cam_alpha",
+            "cam_beta"
+        ],
+        [
+            "cam_beta",
+            "cam_5"
+        ],
+        [
+            "umin_1",
+            "umin_2"
+        ],
+        [
+            "umin_2",
+            "umin_3"
+        ],
+        [
+            "umin_3",
+            "umin_4"
+        ],
+        [
+            "umin_4",
+            "umin_5"
+        ],
+        [
+            "umin_5",
+            "umin_6"
+        ],
+        [
+            "umin_6",
+            "umin_7"
+        ],
+        [
+            "umin_4",
+            "umin_7"
+        ],
+        [
+            "d1",
+            "d2"
+        ],
+        [
+            "d2",
+            "OFFd2"
+        ],
+        [
+            "d2",
+            "d4"
+        ],
+        [
+            "d3",
+            "d4"
+        ],
+        [
+            "d4",
+            "OFFd4"
+        ],
+        [
+            "OFFaur_1",
+            "aur_1"
+        ],
+        [
+            "aur_1",
+            "aur_2"
+        ],
+        [
+            "aur_2",
+            "OFFaur_2"
+        ],
+        [
+            "aur_2",
+            "OFFaur_3"
+        ],
+        [
+            "per_eta",
+            "per_ga"
+        ],
+        [
+            "per_eta",
+            "per_tau"
+        ],
+        [
+            "per_ga",
+            "per_tau"
+        ],
+        [
+            "per_tau",
+            "per_io"
+        ],
+        [
+            "per_ga",
+            "per_al"
+        ],
+        [
+            "per_al",
+            "per_io"
+        ],
+        [
+            "per_io",
+            "per_th"
+        ],
+        [
+            "per_th",
+            "per_phi"
+        ],
+        [
+            "per_io",
+            "per_ka"
+        ],
+        [
+            "per_ka",
+            "per_be"
+        ],
+        [
+            "per_be",
+            "per_rho"
+        ],
+        [
+            "per_be",
+            "per_ep"
+        ],
+        [
+            "OFFper_ep",
+            "per_ep"
+        ],
+        [
+            "per_ep",
+            "per_psi"
+        ],
+        [
+            "per_al",
+            "per_psi"
+        ],
+        [
+            "per_psi",
+            "per_mu"
+        ],
+        [
+            "per_mu",
+            "per_la"
+        ]
+    ],
+    "annotations": [
+        [
+            "Andromeda",
+            65,
+            186
+        ],
+        [
+            "Cassiopeia",
+            110,
+            108
+        ],
+        [
+            "Cepheus",
+            182,
+            86
+        ],
+        [
+            "Camelopardalis",
+            16,
+            48
+        ],
+        [
+            "(Giraffe)",
+            65,
+            57
+        ],
+        [
+            "Ursa Minor",
+            195,
+            33
+        ],
+        [
+            "Draco",
+            302,
+            89
+        ],
+        [
+            "Cygnus",
+            295,
+            180
+        ],
+        [
+            "Perseus",
+            17,
+            145
+        ],
+        [
+            "Auriga",
+            63,
+            11
+        ]
+    ],
+    "titles": []
+}

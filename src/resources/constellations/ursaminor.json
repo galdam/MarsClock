@@ -1,0 +1,244 @@
+{
+    "stars": {
+        "umin_alpha": [
+            286,
+            79
+        ],
+        "umin_delta": [
+            268,
+            56
+        ],
+        "umin_epsilon": [
+            245,
+            37
+        ],
+        "umin_zeta": [
+            210,
+            33
+        ],
+        "umin_mu": [
+            207,
+            13
+        ],
+        "umin_beta": [
+            181,
+            43
+        ],
+        "umin_gamma": [
+            171,
+            22
+        ],
+        "umaj_alpha": [
+            136,
+            167
+        ],
+        "umaj_beta": [
+            112,
+            186
+        ],
+        "umaj_gamma": [
+            75,
+            158
+        ],
+        "umaj_delta": [
+            87,
+            132
+        ],
+        "umaj_epsilon": [
+            73,
+            105
+        ],
+        "umaj_zeta": [
+            63,
+            81
+        ],
+        "umaj_eta": [
+            30,
+            64
+        ],
+        "d1": [
+            163,
+            132
+        ],
+        "d2": [
+            152,
+            98
+        ],
+        "d3": [
+            113,
+            49
+        ],
+        "d4": [
+            103,
+            19
+        ],
+        "OFFd4": [
+            99,
+            3
+        ],
+        "b1": [
+            47,
+            33
+        ],
+        "b2": [
+            46,
+            43
+        ],
+        "OFFb1": [
+            28,
+            36
+        ],
+        "OFFb2": [
+            28,
+            41
+        ]
+    },
+    "links": [
+        [
+            "umin_alpha",
+            "umin_delta"
+        ],
+        [
+            "umin_delta",
+            "umin_epsilon"
+        ],
+        [
+            "umin_epsilon",
+            "umin_zeta"
+        ],
+        [
+            "umin_zeta",
+            "umin_mu"
+        ],
+        [
+            "umin_zeta",
+            "umin_beta"
+        ],
+        [
+            "umin_mu",
+            "umin_gamma"
+        ],
+        [
+            "umin_beta",
+            "umin_gamma"
+        ],
+        [
+            "umaj_eta",
+            "umaj_zeta"
+        ],
+        [
+            "umaj_zeta",
+            "umaj_epsilon"
+        ],
+        [
+            "umaj_epsilon",
+            "umaj_delta"
+        ],
+        [
+            "umaj_delta",
+            "umaj_gamma"
+        ],
+        [
+            "umaj_delta",
+            "umaj_alpha"
+        ],
+        [
+            "umaj_gamma",
+            "umaj_beta"
+        ],
+        [
+            "umaj_beta",
+            "umaj_alpha"
+        ],
+        [
+            "umaj_alpha",
+            "umin_alpha"
+        ],
+        [
+            "d1",
+            "d2"
+        ],
+        [
+            "d2",
+            "d3"
+        ],
+        [
+            "d3",
+            "d4"
+        ],
+        [
+            "d4",
+            "OFFd4"
+        ],
+        [
+            "b1",
+            "b2"
+        ],
+        [
+            "b1",
+            "OFFb1"
+        ],
+        [
+            "b2",
+            "OFFb2"
+        ]
+    ],
+    "annotations": [
+        [
+            "Polaris",
+            290,
+            66
+        ],
+        [
+            "(North)",
+            290,
+            75
+        ],
+        [
+            "Ursa Minor",
+            223,
+            11
+        ],
+        [
+            "(Lesser Bear)",
+            223,
+            20
+        ],
+        [
+            "Ursa Major",
+            8,
+            126
+        ],
+        [
+            "(Great Bear)",
+            8,
+            135
+        ],
+        [
+            "Draco",
+            144,
+            75
+        ],
+        [
+            "Bootes",
+            23,
+            15
+        ],
+        [
+            "Cephus",
+            312,
+            13
+        ],
+        [
+            "Ursa Major points",
+            186,
+            154
+        ],
+        [
+            "to polaris (north star)",
+            165,
+            163
+        ]
+    ],
+    "titles": []
+}
