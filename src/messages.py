@@ -1,9 +1,10 @@
+import marstime
+import time
 import random
-from marsclock import marstime
 
-facts_file = '../resources/content/facts.tsv'
-birthdays_file = '../resources/content/birthdays.tsv'
-events_file = '../resources/content/events.tsv'
+facts_file = 'data/marsfacts.tsv'
+birthdays_file = 'data/birthdays.tsv'
+events_file = 'data/marsdates.tsv'
 
 
 line_length = (400//8)-4

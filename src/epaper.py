@@ -44,8 +44,7 @@ from machine import Pin, SPI
 import framebuf
 import time
 import asyncio
-
-# from drivers.boolpalette import BoolPalette
+#from drivers.boolpalette import BoolPalette
 
 
 CK = 0
@@ -89,15 +88,15 @@ _BUSY_PIN = const(13)
 lut_full = (b"\x00\x08\x08\x00\x00\x02\x00\x0F\x0F\x00\x00\x01\x00\x08\x08\x00\
 \x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\
 \x00\x00\x00\x00\x00\x00",
-            b"\x50\x08\x08\x00\x00\x02\x90\x0F\x0F\x00\x00\x01\xA0\x08\x08\x00\x00\x02\
-        \x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
-            b"\x50\x08\x08\x00\x00\x02\x90\x0F\x0F\x00\x00\x01\xA0\x08\x08\x00\x00\x02\
-        \x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
-            b"\xA0\x08\x08\x00\x00\x02\x90\x0F\x0F\x00\x00\x01\x50\x08\x08\x00\x00\x02\
-        \x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
-            b"\x20\x08\x08\x00\x00\x02\x90\x0F\x0F\x00\x00\x01\x10\x08\x08\x00\x00\x02\
-        \x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
-            )
+    b"\x50\x08\x08\x00\x00\x02\x90\x0F\x0F\x00\x00\x01\xA0\x08\x08\x00\x00\x02\
+\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+    b"\x50\x08\x08\x00\x00\x02\x90\x0F\x0F\x00\x00\x01\xA0\x08\x08\x00\x00\x02\
+\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+    b"\xA0\x08\x08\x00\x00\x02\x90\x0F\x0F\x00\x00\x01\x50\x08\x08\x00\x00\x02\
+\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+    b"\x20\x08\x08\x00\x00\x02\x90\x0F\x0F\x00\x00\x01\x10\x08\x08\x00\x00\x02\
+\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+)
 
 # ******************************partial screen update LUT********************************* #
 
@@ -134,7 +133,6 @@ def _linv(dest: ptr32, source: ptr32, length: int):
         n -= 1
 """
 
-
 # Bit reverse an 8 bit value
 def rbit8(v):
     v = (v & 0x0f) << 4 | (v & 0xf0) >> 4
@@ -162,7 +160,7 @@ class EPD(framebuf.FrameBuffer):
         self._cs_pin = Pin(_CS_PIN, Pin.OUT)
         self._dc_pin = Pin(_DC_PIN, Pin.OUT)
         self._spi = SPI(1, sck=Pin(10), mosi=Pin(11), miso=Pin(28))
-        # self._spi._setup(baudrate=10_000_000)  # Datasheet limit 10MHz
+        #self._spi._setup(baudrate=10_000_000)  # Datasheet limit 10MHz
 
         # Busy flag: set immediately on .show().
         # Cleared when busy pin is logically false.
@@ -193,7 +191,7 @@ class EPD(framebuf.FrameBuffer):
         self.wait_until_ready()
 
         self._send_command(b"\x00", b"\xbf")  # panel setting
-        self._send_command(b"\x30", b"\x3c")  # PLL setting
+        self._send_command(b"\x30", b"\x3c")  #  PLL setting
         self._send_command(b"\x61", b"\x01\x90\x01\x2C")  # resolution setting
         self._send_command(b"\x82", b"\x28")  # vcom_DC setting
         self._send_command(b"\x50", b"\x97")  # VCOM AND DATA INTERVAL SETTING
@@ -335,8 +333,9 @@ class EPD(framebuf.FrameBuffer):
         self._busy = False
         self.display_refresh()
 
+
     def sleep(self):
-        self._send_command(b"\x50", b"\xf7")  # Vcom and data interval setting (CDI)
+        self._send_command(b"\x50", b"\xf7") # Vcom and data interval setting (CDI)
         # VCOM AND DATA INTERVAL SETTING PGH 97 black border 57 white border
         # border floating? '11110111'
         self._send_command(b"\x02")  # C4: Power OFF Sequence Setting (PFS)
@@ -344,3 +343,41 @@ class EPD(framebuf.FrameBuffer):
         # Todo: ^^ check if we need the stuff above ^^
         self._send_command(b"\x07", b"\xa5")  # deep sleep
 
+
+
+if __name__ == '__main__':
+    epd = EPD()
+    
+    """print('Write message one to buffer')
+    epd.text("Waveshare", 5, 10, CK)
+    epd.text("Pico_ePaper-4.2-B", 5, 40, CW)
+    epd.text("Raspberry Pico", 5, 70, CK)
+    print('Display message one')
+    epd.show()
+    time.sleep(2)"""
+    epd.fill(CW)
+    epd.text("Waveshare", 15, 10, CK)
+    epd.text("Pico_ePaper-4.2-B", 15, 40, CK)
+    epd.text("Raspberry Pico", 15, 70, CK)
+    epd.show()
+    time.sleep(2)
+    
+    epd.set_partial_update()
+    for i in range(10):
+        print(i)
+        msg = f"Num: {i}"
+        #epd.rect(20, 80, 8*len(msg), 8, 0, True)
+        epd.text(msg, 20, 80, CK, CW)
+        epd.show()
+        time.sleep(1)
+    
+    epd.set_full_update()
+    epd.text("Raspberry Pico", 15, 100, 3)
+    epd.show()
+    time.sleep(2)
+    
+    print("Clear screen")
+    epd.clear()
+    print("Shutting down")
+    epd.sleep()
+    print("~ DONE ~")

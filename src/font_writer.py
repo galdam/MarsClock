@@ -29,18 +29,15 @@ __version__ = (0, 5, 1)
 
 fast_mode = True  # Does nothing. Kept to avoid breaking code.
 
-
 class DisplayState():
     def __init__(self):
         self.text_row = 0
         self.text_col = 0
 
-
 def _get_id(device):
     if not isinstance(device, framebuf.FrameBuffer):
         raise ValueError('Device must be derived from FrameBuffer.')
     return id(device)
-
 
 # Basic Writer class for monochrome displays
 class Writer():
@@ -63,7 +60,7 @@ class Writer():
             s.text_col = col
         return s.text_row,  s.text_col
 
-    def __init__(self, device, font, verbose=True, invert=False):
+    def __init__(self, device, font, verbose=True):
         self.devid = _get_id(device)
         self.device = device
         if self.devid not in Writer.state:
@@ -94,8 +91,6 @@ class Writer():
         self.char_height = 0
         self.char_width = 0
         self.clip_width = 0
-
-        self.invert=invert
 
     def _getstate(self):
         return Writer.state[self.devid]
@@ -135,10 +130,6 @@ class Writer():
                 self._printline(s, invert)
             if n != last:
                 self._printchar('\n')
-
-    def print(self, s, x, y):
-        self.set_textpos(self.device, y, x)
-        self.printstring(s, invert=self.invert)
 
     def _printline(self, string, invert):
         rstr = None

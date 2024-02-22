@@ -1,50 +1,54 @@
+import marstime
 import time
-
-from marsclock import marstime
-
-from marsclock.drivers.pico_epaper_42_BRW import EPD
-from marsclock.drivers.ds3231_gen import DS3231, MockDS3231
-from marsclock.drivers.button import ButtonListener
-
-from marsclock.fonts.font_writer import Writer
-from marsclock.fonts import font_krungthep14
-
-from marsclock.widgets.solarwidget import SolarWidget
-from marsclock.widgets.constellationwidget import ConstellationWidget
-from marsclock.content import messages
+from solarwidget import SolarWidget
+from epaper import EPD, CK, CW
+from machine import Pin, I2C
+from ds3231_gen import DS3231
+import font_krungthep14
+import framebuf
+from font_writer import Writer
+import messages
+import constellationwidget
+import random
 
 
-CW = 0
-CB = 1
-CR = 1
+class ButtonListener:
+    def __init__(self):
+        self.pins = {
+            'key0': Pin(15, Pin.IN, Pin.PULL_UP),  # GP15
+            'key1': Pin(17, Pin.IN, Pin.PULL_UP),  # GP17
+        }
+        self.states = {k: 1 for k in self.pins.keys()}
+
+    def __get_pin_state(self, k):
+        state = self.pins[k].value() == 0
+        updated = state == self.states[k]
+        self.states[k] = state
+        return state, updated
+
+    def get_states(self):
+        return {k: self.__get_pin_state(k) for k in self.pins}
+
 
 class Display:
     def __init__(self):
         # Load Hardware
         self.epd = EPD()
         self.buttons = ButtonListener()
-        try:
-            self.ds3231 = DS3231()
-        except RuntimeError as err:
-            print(err)
-            self.ds3231 = MockDS3231()
+        self.ds3231 = DS3231()
+        # print(self.ds3231.get_time())
 
         self.demo_mode = False
         self.margin = 16
 
-        self.earth_time, self.mars_time = self._get_times()
-
         # Solar Widget
         self.solar_size = 70
         self.solar_position = 200 - (self.solar_size // 2), 10
-        self.solar_widget = SolarWidget(self.epd, self.solar_size, self.solar_position)
+        self.solar_widget = SolarWidget(self.solar_size, self.solar_position)
 
-        # Constellation Widget
-        self.constellation_widget = ConstellationWidget(self.epd, (15, 85))
+        self.earth_time, self.mars_time = self._get_times()
 
-        self.fonts = {'krungthep14': Writer(self.epd, font_krungthep14)}
-        self.title_font = 'krungthep14'
-
+        self.krungthep_writer = Writer(self.epd, font_krungthep14)
 
     def _time_diff_mask(self):
         et, mt = self._get_times()
@@ -58,6 +62,20 @@ class Display:
         mt = marstime.MarsCal.from_earthtime(et)
         return et, mt
 
+    def _draw_solar_system(self):
+        earth_days = self.earth_time.tm_yday
+        mars_days = self.mars_time.tm_yday
+
+        ps = 4
+        # Draw the sun in
+        self.epd.ellipse(*self.solar_widget.sun(), ps, ps, CK, True)
+        for planet, days in [('mars', mars_days), ('earth', earth_days)]:
+            # Draw the path
+            self.epd.ellipse(*self.solar_widget.planet_path(planet), CK)
+            # Erase the area around the planet
+            self.epd.ellipse(*self.solar_widget.planet_loc(planet, days), ps + 3, ps + 3, CW, True)
+            # Draw the planet
+            self.epd.ellipse(*self.solar_widget.planet_loc(planet, days), ps, ps, CK, True)
 
     def draw_time(self):
         ltext = self.margin
@@ -76,17 +94,17 @@ class Display:
 
         y = 42
         c_x = ltext + (((200 - 30)-ltext)/2)
-        self.write_centered_str(self.title_font, c_x, y, earth_clock)
-        self.write_centered_str(self.title_font, 400 - c_x, y, mars_clock)
+        self.write_centered_str(c_x, y, earth_clock)
+        self.write_centered_str(400 - c_x, y, mars_clock)
 
-    def write_centered_str(self, font, center_x, y, text):
-        char_width = self.fonts[font].font.max_width()
-        x = int(center_x - (( char_width * len(text) ) / 2))
-        self.fonts[font].print(text,x, y)
+    def write_centered_str(self, center_x, y, text):
+        x = int(center_x - (( 13 * len(text) ) / 2))
+        self.krungthep_writer.set_textpos(self.epd, y, x)
+        self.krungthep_writer.printstring(text, invert=True)
 
     def draw_mirrored_hline(self, x_start, x_end, y):
-        self.epd.line(x1=x_start, y1=y, x2=x_end, y2=y, c=CB)
-        self.epd.line(x1=400-x_end, y1=y, x2=400-x_start, y2=y, c=CB)
+        self.epd.line(x_start, y, x_end, y, CK)
+        self.epd.line(400-x_end, y, 400-x_start, y, CK)
 
 
     def draw_date_info(self):
@@ -100,19 +118,19 @@ class Display:
         mars_dt = marstime.MarsCal.print_datetime(self.mars_time)
 
         y = 20
-        self.epd.text(s='{:>16}'.format(earth_dt[0]), x=ltext, y=y, c=CB)
-        self.epd.text(s='{:<16}'.format(mars_dt[0]), x=rtext, y=y, c=CB)
+        self.epd.text('{:>16}'.format(earth_dt[0]), ltext, y, CK)
+        self.epd.text('{:<16}'.format(mars_dt[0]), rtext, y, CK)
 
         y = 30
-        self.epd.text(s='{:>16}'.format(earth_dt[1]), x=ltext, y=y, c=CB)
-        self.epd.text(s='{:<16}'.format(mars_dt[1]), x=rtext, y=y, c=CB)
+        self.epd.text('{:>16}'.format(earth_dt[1]), ltext, y, CK)
+        self.epd.text('{:<16}'.format(mars_dt[1]), rtext, y, CK)
 
         self.draw_time()
 
         y = 60
         c_x = ltext + (((200 - 30)-ltext)/2)
-        self.write_centered_str(self.title_font, c_x, y, earth_dt[3])
-        self.write_centered_str(self.title_font, 400 - c_x, y, mars_dt[3])
+        self.write_centered_str(c_x, y, earth_dt[3])
+        self.write_centered_str(400 - c_x, y, mars_dt[3])
 
         y = 80
         self.draw_mirrored_hline(ltext, 200 - 30, y)
@@ -127,16 +145,16 @@ class Display:
 
         for i, p in enumerate(paragraph):
             for line in p:
-                self.epd.text(s=line, x=ltext, y=line_start + (line_num * 9), c=CB)
+                self.epd.text(line, ltext, line_start + (line_num * 9), CK)
                 line_num += 1
             if 1+i < len(paragraph):
-                line_num += 1
+                line_num+=1
                 y = line_start + (line_num * 9)
-                self.epd.line(x1=200-30, y1=y, x2=200+30, y2=y, c=CB)
+                self.epd.line(200-30, y, 200+30, y, CK)
                 line_num += 1
 
         y = 300 - 10
-        self.epd.line(x1=self.margin, y1=y, x2=400 - self.margin, y2=y, c=CB)
+        self.epd.line(self.margin, y, 400 - self.margin, y, CK)
 
     def update_time(self):
         self.epd.set_partial_update()
@@ -151,12 +169,17 @@ class Display:
     def update_all(self):
         self.epd.set_full_update()
         self.epd.fill(CW)
-        self.solar_widget.draw(self.earth_time, self.mars_time)
+        self._draw_solar_system()
         self.draw_date_info()
 
         msgs = messages.select_messages(self.earth_time, self.mars_time)
         if msgs is None:
-            self.constellation_widget.draw(self.constellation_widget.pick_constellation())
+            starmaps=[
+            'bootes','cepheus', 'draco',
+            'gemini', 'orion', 'ursaminor'
+            ]
+            constellation=random.choice(starmaps)
+            constellationwidget.draw_star_chart(self.epd, (15, 85), constellation)
         else:
             paragraphs = [messages.format_message(m) for m in msgs]
             self.draw_messages(paragraphs)
@@ -215,6 +238,26 @@ class Display:
             time.sleep_ms(10)
 
 
+def test_loop(epd):
+    print('Write message one to buffer')
+    epd.text("Waveshare", 5, 10, CK)
+    epd.text("Pico_ePaper-4.2-B", 5, 40, CW)
+    epd.text("Raspberry Pico", 5, 70, CK)
+    print('Display message one')
+    epd.show()
+    time.sleep(5)
+
+
+"""if key_state['key0'][0] & key_state['key0'][1]:
+                print('Key0 Pressed')
+            if key_state['key1'][0] & key_state['key1'][1]:
+                print('Key1 Pressed')
+            if key_state['key0'][0] & key_state['key1'][0]:
+                print('Both Keys 0 and 1 Pressed')
+                break
+"""
+
+
 def run():
     print("Start ePaper")
     disp = Display()
@@ -227,7 +270,6 @@ def run():
 
     finally:
         disp.shutdown()
-
 
 if __name__ == '__main__':
     run()

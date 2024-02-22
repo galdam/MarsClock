@@ -1,4 +1,4 @@
-from marsclock import marstime
+import marstime
 
 
 def get_birthday_record(name, year, month, day):
@@ -18,6 +18,6 @@ if __name__ == '__main__':
         ('Ma', 1957, 3, 21),
         ('Pa', 1955, 11, 7),
     ]
-    with open('resources/content/birthdays.tsv', 'w') as fh:
+    with open('data/birthdays.tsv', 'w') as fh:
         fh.write('\n'.join(['\t'.join(get_birthday_record(*b)) for b in birthdays]))
     

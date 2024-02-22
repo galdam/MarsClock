@@ -1,5 +1,7 @@
 import time
+import math
 from collections import namedtuple
+
 
 MARS_MONTHS = 'Darian'
 MARS_DAYS = 'Darian'
@@ -33,60 +35,36 @@ DAYS = {
         0: 'Monday', 1: 'Tuesday', 2: 'Wednesday', 3: 'Thursday', 4: 'Friday', 5: 'Saturday', 6: 'Sunday',},
 }
 
-# DateTime tuple that mimics the time.struct_time
+
 DateTimeTup = namedtuple(
     'DateTimeTup',
     ('tm_year', 'tm_mon', 'tm_mday', 'tm_hour', 'tm_min', 'tm_sec', 'tm_wday', 'tm_yday'))
 
-
-def compare_datetimes(dt_a, dt_b):
-    """Compare two date-time tuples.
-     Return a list of booleans for which values match."""
-    return [a == b for a, b in zip(dt_a, dt_b)]
+def compare_datetimes(time_a, time_b):
+    return [a == b for a, b in zip(time_a, time_b)]
 
 
 def make_struct_time(tm_year, tm_mon, tm_mday, tm_hour=0, tm_min=0, tm_sec=0, *args):
-    """Create a struct-time style tuple, filling in the hour, min, sec as 0 if not given."""
+    #return time.struct_time((tm_year, tm_mon, tm_mday, tm_hour, tm_min, tm_sec, 0, 1, -1))
     return (tm_year, tm_mon, tm_mday, tm_hour, tm_min, tm_sec, 0, 1, -1)
 
 
+#def make_datetime_tup(*args):
+#    return DateTimeTup(make_struct_time(*args))
+
 def make_datetime_tup(*args, **kwargs):
-    """Create a date-time tuple, filling in the hour, min, sec as 0 if not given."""
     return DateTimeTup(*make_struct_time(*args, **kwargs)[:8])
 
-
 def format_date_tup(dt):
-    """Format a date in the format YYYY-MM-DD"""
     return f'{dt.tm_year}-{dt.tm_mon:02d}-{dt.tm_mday:02d}'
 
-
-def print_datetime(dt, cal_names):
-    month_name, day_name = cal_names
-    print(dt)
-    return [
-        f'{day_name}',
-        f'{dt.tm_mday} {month_name}',
-        f'{dt.tm_hour:0>2d}:{dt.tm_min:0>2d}',
-        f'{dt.tm_year}/{dt.tm_mon:0>2d}/{dt.tm_mday:0>2d}',
-    ]
-
-
-def time_to_period(hour):
-    abrv = 'am' if hour < 12 else 'pm'
-    hr = hour % 12
-    hr = 12 if hr == 0 else hr
-    return f'{hr}{abrv}'
-
-
 class EarthCal:
-    """Functionality for the Earth Calendar"""
     @staticmethod
     def now():
         return time.gmtime()
     
     @staticmethod
     def print_datetime(earth_time):
-        """Print the """
         return print_datetime(earth_time, EarthCal.date_names(earth_time))
     
     @staticmethod
@@ -97,10 +75,8 @@ class EarthCal:
 
 
 class MarsCal:
-    """Functionality for Mars calendar date-times"""
     @staticmethod
     def now():
-        """Get the current Mars calendar date-time"""
         return MarsCal.from_earthtime(EarthCal.now())
 
     @staticmethod
@@ -109,7 +85,6 @@ class MarsCal:
 
     @staticmethod
     def timedelta(date_a, date_b):
-        """Calculate the mars time delta"""
         years = date_b.tm_year - date_a.tm_year
         sols = date_b.tm_yday - date_a.tm_yday 
         if sols < 0:
@@ -248,3 +223,75 @@ class MarsTime:
         j2kdelta = (seconds_since_unix_epoch - MarsTime.J2K_epoch_start) / 86400
         mst = MarsTime.j2kdelta_2_mst(j2kdelta)
         return mst
+
+def print_datetime(dt, cal_names):
+    month_name, day_name = cal_names
+    print(dt)
+    return [
+        f'{day_name}',
+        f'{dt.tm_mday} {month_name}',
+        # f'{dt.tm_hour:0>2d}:{dt.tm_min:0>2d}:{dt.tm_sec:0>2d}',
+        f'{dt.tm_hour:0>2d}:{dt.tm_min:0>2d}',#:{dt.tm_sec:0>2d}',
+        f'{dt.tm_year}/{dt.tm_mon:0>2d}/{dt.tm_mday:0>2d}',
+    ]
+
+
+def time_to_period(hour):
+    abrv = 'am' if hour < 12 else 'pm'
+    hr = hour % 12
+    hr = 12 if hr == 0 else hr
+    return f'{hr}{abrv}'
+
+
+if __name__ == '__main__':
+    #earth_time = DateTimeTup(tm_year=2023, tm_mon=12, tm_mday=14, tm_hour=21, tm_min=54, tm_sec=49, tm_wday=3, tm_yday=0)
+
+    #earth_time = DateTimeTup(tm_year=2020, tm_mon=12, tm_mday=15, tm_hour=21, tm_min=29, tm_sec=23, tm_wday=3, tm_yday=0)
+
+    #DateTimeTup(tm_year=220, tm_mon=13, tm_mday=11, tm_hour=22, tm_min=41, tm_sec=15, tm_wday=4, tm_yday=345)
+    #DateTimeTup(tm_year=2023, tm_mon=12, tm_mday=14, tm_hour=21, tm_min=29, tm_sec=27, tm_wday=3, tm_yday=0)
+    #DateTimeTup(tm_year=220, tm_mon=13, tm_mday=11, tm_hour=22, tm_min=41, tm_sec=15, tm_wday=4, tm_yday=345)
+    #DateTimeTup(tm_year=2023, tm_mon=12, tm_mday=14, tm_hour=21, tm_min=29, tm_sec=32, tm_wday=3, tm_yday=0)
+    #DateTimeTup(tm_year=220, tm_mon=13, tm_mday=11, tm_hour=22, tm_min=41, tm_sec=15, tm_wday=4, tm_yday=345)
+    #et = earth_time
+    earth_time = (2020, 12, 14, 22, 9, 10, 3, 348)
+    mst = MarsTime.from_earthtime(earth_time)
+    tm = make_struct_time(*earth_time)
+    print(time.mktime(tm) )
+    print(mst)
+    
+    earth_time = (2020, 12, 14, 22, 9, 20, 3, 348)
+    mst = MarsTime.from_earthtime(earth_time)
+    tm = make_struct_time(*earth_time)
+    print(time.mktime(tm) )
+    print(mst)
+    
+    earth_time = (2020, 12, 14, 22, 9, 30, 3, 348)
+    mst = MarsTime.from_earthtime(earth_time)
+    tm = make_struct_time(*earth_time)
+    print(time.mktime(tm) )
+    print(mst)
+    
+    while True:
+        earth_time = time.gmtime()
+        mst = MarsTime.from_earthtime(earth_time)
+        mars_time = MarsCal.from_earthtime(earth_time)
+        print(earth_time)
+        print(mst)
+        print(mars_time)
+        time.sleep(5)
+        break
+    #from ds3231_gen import DS3231
+    #ds3231 = DS3231()
+    
+    #while True:
+    #    earth_time = DateTimeTup(*ds3231.get_time())
+    #    mars_time = MarsCal.from_earthtime(earth_time)
+    #    print(mars_time)
+    #    time.sleep(3)
+    #earth_time = time.gmtime()
+    #mars_time = MarsCal.from_earthtime(earth_time)
+    #earth_dt = print_datetime(earth_time, EarthCal.date_names(earth_time))
+    #mars_dt = print_datetime(mars_time, MarsCal.date_names(mars_time))
+    #print('\n'.join(earth_dt))
+    #print('\n'.join(mars_dt))

@@ -1,4 +1,4 @@
-# ds3231_gen.py General purpose driver for DS3231 precision real time clock.
+# ds3231_gen.py General purpose driver for DS3231 precison real time clock.
 
 # Author: Peter Hinch
 # Copyright Peter Hinch 2023 Released under the MIT license.
@@ -67,13 +67,6 @@ class Alarm:
 I2C_PORT = 0
 I2C_SDA = 20
 I2C_SCL = 21
-
-class MockDS3231:
-    def __init__(self):
-        pass
-
-    def get_time(self):
-        return time.gmtime()
 
 class DS3231:
     def __init__(self, i2c=None):
@@ -149,7 +142,6 @@ class DS3231:
     
 
 if __name__ == '__main__':
-
     ds3231 = DS3231()
     ds3231.set_time()
     print(ds3231.get_time())
