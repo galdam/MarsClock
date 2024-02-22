@@ -13,6 +13,7 @@ This can be changed when uP is built, documentation here is how I did it.
   * [Arm Compiler](#arm-compiler)
   * [Install MacPorts](#install-macports)
 * [Build MicroPython](#build-microPython)
+* [Install MicroPython](#install-microPython)
 
 
 ## Setup
@@ -52,7 +53,7 @@ Based on this, but also I think it's out of date: https://github.com/micropython
 ```
 # libffi (minimum version 3.1-4 from Macports)
 sudo port install libffi
-#pkgconfig
+# pkgconfig
 sudo port install pkgconfig
 ```
 
@@ -143,8 +144,12 @@ Build Information
  build attributes:  MinSizeRel
 ```
 
-Install onto the pico:
-https://micropython.org/download/RPI_PICO/
+## Install MicroPython
+
+Install onto the pico: https://micropython.org/download/RPI_PICO/
+
+First, put the pico into boot mode by holding down the BOOTSEL button while plugging the board into the USB port. A USB mass storage device should appear and the uf2 files can be copied across.
+
 ```
 cp ./firmware.uf2  /Volumes/RPI-RP2/
 ```
