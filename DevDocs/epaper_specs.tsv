@@ -1,0 +1,13 @@
+Name	Manufacturer	ReleaseDate	Size	Colors	PartialRefresh	Driver
+WAV-20344/Pico-ePaper-4.2	Waveshare	2017-03	4.2in	KW	Yes	UC8176	https://www.waveshare.com/wiki/Pico-ePaper-4.2
+Pico-ePaper-4.2-V2	Waveshare	20?	4.2in	KW	Yes	SSD1683	https://www.waveshare.com/wiki/Pico-ePaper-4.2
+GDEQ042T81	GooDisplay	2022-06	4.2in	800x400	KW	Yes	SSD1683	https://www.good-display.com/product/443.html
+WAV-20345/Pico-ePaper-4.2-B	Waveshare	2020-11	4.2in	KWR	No	UC8276	https://www.waveshare.com/wiki/Pico-ePaper-4.2-B
+GDEY042Z98	GooDisplay	2020-08	4.2in	KWR	Yes	SSD1683/SSD1619A/UC8276c
+WAV-20128/Pico-ePaper-7.5	Waveshare	2019-06	7.5in	800x480	KW	Yes	UC8179/GD7965	https://www.waveshare.com/Pico-ePaper-7.5.htm	GD7965
+WAV-20129/Pico-ePaper-7.5-B	Waveshare	2020-08	7.5in	800x480	KWR	No	UC8179	https://www.waveshare.com/Pico-ePaper-7.5-B.htm
+GDEW075Z09	GooDisplay	2015	7.5in 640x384 KWR No IL0371 https://www.e-paper-display.com/products_detail/productId=324.html
+GDEY075Z08	GooDisplay	2020-08	7.5in	800x480	KWR	Yes	UC8179
+WAV-23434/7.3inch-e-Paper-HAT-(F)	Waveshare	2021-11	7.3in	800x480	7col	No	?	https://www.waveshare.com/7.3inch-e-paper-hat-f.htm
+GDEY073D46	GooDisplay	2022-07	7.3in	800x480	7col	No	?	https://www.good-display.com/product/442.html
+GDEP073E01	GooDisplay	2024-02	7.3in	800x480	7col	No	?	https://www.good-display.com/product/533.html

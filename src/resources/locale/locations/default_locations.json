@@ -1,0 +1,22 @@
+[
+  {
+    "Location": "Cambridge, GB",
+    "Latitude": 52.1951,
+    "Longitude": 0.1313
+  },
+  {
+    "Location": "Coventry, GB",
+    "Latitude": 52.4128,
+    "Longitude": -1.509
+  },
+  {
+    "Location": "Aberdeen, GB",
+    "Latitude": 57.1499,
+    "Longitude": -2.0938
+  },
+  {
+    "Location": "Sydney, AU",
+    "Latitude": -33.8688,
+    "Longitude": 151.2093
+  }
+]

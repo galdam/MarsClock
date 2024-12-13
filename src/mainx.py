@@ -10,7 +10,7 @@ def run():
 
     # Initialise the hardware object
     hardware = Hardware(
-        display=DisplayDevice(rotation=0),
+        display=DisplayDevice(rotation=2),
         rtc=RtcClockDevice()
     )
 

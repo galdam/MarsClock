@@ -1,0 +1,7 @@
+{
+  "EARTH_DST_MODE": "BST",
+  "EARTH_TIMEZONE": "GMT",
+  "EARTH_LOCATION_NAME": "Cambridge, UK",
+  "EARTH_DATETIME_LOCALE": "earth.gregorian",
+  "MARS_DATETIME_LOCALE": "mars.darian"
+}
