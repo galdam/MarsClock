@@ -13,7 +13,7 @@ import time
 import machine
 
 
-_ADDR = const(104)
+_ADDR = const(104) # 0x68
 
 EVERY_SECOND = 0x0F  # Exported flags
 EVERY_MINUTE = 0x0E
@@ -145,11 +145,12 @@ class RtcClockDevice:
     
 
 if __name__ == '__main__':
-    pass
-    #ds3231 = DS3231()
+    ds3231 = RtcClockDevice()
+    print("Current DS3231 time:", ds3231.get_time())
+
     # Set the chip to use the UTC. Time zones and BST should be sorted out on the other end.
-    #print(time.localtime())
-    #t = list(time.gmtime())
+    print("Current GMT time:", time.gmtime())
+    t = list(time.gmtime())
     #t[3] = t[3]-1
-    #ds3231.set_time(t)
-    #print(ds3231.get_time())
+    ds3231.set_time(t)
+    print("New DS3231 time:", ds3231.get_time())

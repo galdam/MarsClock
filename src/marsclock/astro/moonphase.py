@@ -1,6 +1,9 @@
+"""
+Estimate the phase of the moon.
+"""
+
 LEFT = 6
 RIGHT = 9
-
 
 class MoonPhase:
     """
@@ -53,7 +56,7 @@ class MoonPhase:
         size - int; size of the moon to be drawn
         phase_pct - float; the percentage of the way through the moon phase
         """
-        quart_pct = (phase_pct * 0.25) % 1
+        quart_pct = (phase_pct * 4) % 1
         r = size // 2
         x, y = xo+r, yo+r
         # Erase the background

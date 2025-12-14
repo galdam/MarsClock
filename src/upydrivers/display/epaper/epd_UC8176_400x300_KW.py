@@ -44,7 +44,8 @@ lut_map = {
 }
 
 
-class DisplayDevice(PartialUpdateMixin, MonoColorDevice):
+class DisplayDevice(PartialUpdateMixin, 
+                    MonoColorDevice):
     _name = "epd_UC8176_400x300_KW"
     _width, _height = 400, 300
 
@@ -65,14 +66,19 @@ class DisplayDevice(PartialUpdateMixin, MonoColorDevice):
 
         # 2. Power Setting (PWR)
         self._send_command(b"\x01", b"\x03\x00\x2b\x2b")  # Default
-        # self._send_command(0x01, b"\x03\x00\x2b\x2b\x09")  # Wav reference doc
+        # # self._send_command(b'\x01', b"\x03\x00\x2b\x2b\x09")  # Wav reference doc
+        # VDS_EN, VDG_EN : x03
+        # VCOM_HV, VGHL_LV: x00: VGH=20V,VGL=-20V
+        # VDH[5:0]: x2b: VDH=15V
+        # VDL[5:0]: x2b: VDL=-15V
+        # VDHR[5:0]: 
 
         # 7. Booster Soft Start (BTST)
         self._send_command(b"\x06", b"\x17\x17\x17")
 
         # 5. Power ON (PON)
-        self._send_command(b"\x04")  # POWER ON
-        self._wait_until_ready(100)
+        #self._send_command(b"\x04")  # POWER ON
+        #self._wait_until_ready(100)
 
         # 1. PANEL SETTING (PSR)
         # Load the default settings
@@ -94,9 +100,10 @@ class DisplayDevice(PartialUpdateMixin, MonoColorDevice):
         # >> self._send_command(b"\x15", b"\x00")
 
         self.enable_full_updates()
+        # self._activate_full_updates()
 
     def _send_refresh_commands(self):
-        upylog.trace('DisplayDevice._send_refresh_commands')
+        upylog.trace('[DisplayDevice._send_refresh_commands]')
         self._send_command(b"\x04",)   # C5: PON (Power on)
         self._wait_until_ready(100)
 
@@ -107,7 +114,27 @@ class DisplayDevice(PartialUpdateMixin, MonoColorDevice):
         self._send_command(b"\x02",)  # C3: POF (Power Off)
 
     def _deep_sleep(self):
-        upylog.trace('DisplayDevice._deep_sleep')
+        upylog.trace('[DisplayDevice._deep_sleep]')
         self._send_command(b"\x07", b"\xa5")
         self.is_initialised = False
 
+
+
+if __name__ == "__main__":
+    print("Starting Display Device")
+    dd = DisplayDevice()
+    print("Display Device Initiated")
+      
+    dd.fill(1)
+    
+    dd.text("Waveshare", 5, 10, 0)
+    dd.text("Pico_ePaper-4.2", 5, 40, 0)
+    dd.text("Raspberry Pico", 5, 70, 0)
+    
+    print("Showing Display Device")
+    
+    dd.show()
+    
+    print("Showed Display Device")
+
+    

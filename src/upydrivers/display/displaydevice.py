@@ -7,17 +7,19 @@ import math
 try:
     from machine import Pin, SPI
     import time
+    #import framebuf
 except ImportError:
     from mockmicro.machine import Pin, SPI
     from mockmicro import time
+    #from mockmicro import framebuf
 
-# from upydrivers.display import framebufferplus
-import framebuf
-
+from upydrivers import upylog
+from upydrivers.display.framebufferplus import FrameBufferPlus
 from upydrivers.display.palette import AbsPalette
+#from upydrivers.display.font.bitmapfont import BitmapFont
 
 
-class AbstractUPyDisplayDevice(framebuf.FrameBuffer): #, metaclass=ABCMeta):
+class AbstractUPyDisplayDevice(FrameBufferPlus): #, metaclass=ABCMeta):
     """
     # TODO: I'm guessing a bit here, but my hope is that this set of functions are all that would need to be
     """
@@ -35,17 +37,23 @@ class AbstractUPyDisplayDevice(framebuf.FrameBuffer): #, metaclass=ABCMeta):
         # Buffer Settings
         self.rotation = rotation
         if not 0 <= rotation <= 3:
-            raise ValueError(f"Rotation must be in the range 0 to 3. Value: {rotation}.")
+            raise ValueError("Rotation must be in the range 0 to 3. Value: {}.", rotation)
         self.width, self.height = (width, height) if rotation % 2 == 0 else (height, width)
-        if rotation > 0:
-            pass
-            # raise NotImplementedError("Rotation is not implemented yet")
-        print(f"Size: {self.width} x {self.height}")
-        self._buffer = bytearray(self.height * math.ceil(self.width / (8 // self.palette.nbits)))
-        self._has_full_updates = True
-        self._has_partial_updates = True
-        print(f"Buffer len: {len(self._buffer)} ({self.height} * {math.ceil(self.width / (8 // self.palette.nbits))}).",
-              f"Palette nBits: {self.palette.nbits}")
+        #if rotation > 0:
+        #    pass
+        #    # raise NotImplementedError("Rotation is not implemented yet")
+        upylog.info("[DisplayDevice.init] Size: {} x {}", self.width, self.height)
+        upylog.info("[DisplayDevice.init] Palette nBits: {}", self.palette.nbits)
+        
+        buffer_len = self.height * math.ceil(self.width / (8 // self.palette.nbits))
+        upylog.info("[DisplayDevice.init] Buffer len: {} bytes (h:{} * ceil(w:{} / (8 // nbits:{}))",
+                    buffer_len, self.height, self.width, self.palette.nbits)
+        self._buffer = bytearray(buffer_len)
+        #self._updates = 2
+        #self._has_full_updates = True
+        #self._has_partial_updates = True
+        self._font = None
+
         # TODO: Workout if this works with the H/V modes. Some additional transformations may need to be done
         super().__init__(self._buffer, self.width, self.height, self.framebuf_mode)
 
@@ -64,6 +72,7 @@ class AbstractUPyDisplayDevice(framebuf.FrameBuffer): #, metaclass=ABCMeta):
         """"""
         raise NotImplementedError()
 
+    __ = '''
     @property
     def has_update(self):
         return self._has_full_updates or self._has_partial_updates
@@ -72,10 +81,10 @@ class AbstractUPyDisplayDevice(framebuf.FrameBuffer): #, metaclass=ABCMeta):
         self._has_full_updates = True
 
     def apply_partial_update(self):
-        self._has_partial_updates = True
+        self._has_partial_updates = True'''
 
     #@abstractmethod
-    def show(self):
+    def show(self, force):
         raise NotImplementedError()
 
     @property
@@ -84,14 +93,21 @@ class AbstractUPyDisplayDevice(framebuf.FrameBuffer): #, metaclass=ABCMeta):
         raise NotImplementedError()
 
     def _wait_until_ready(self, wait_before=0):
+        upylog.trace('[DisplayDevice._wait_until_ready]')
         time.sleep_ms(wait_before)
         while not self.ready:
             time.sleep_ms(100)
-
+    
+    __ = '''
     @staticmethod
     def _sleep_ms(t):
         # I'm being lazy - I just don't want to do the messy time import for all implementations
         time.sleep_ms(t)
+    '''
+
+    @property
+    def partial_updates_supported(self):
+        return False
 
     def enable_partial_updates(self):
         """Although not all displays support partial updates, this is exposed to make the interface generic."""
@@ -101,22 +117,7 @@ class AbstractUPyDisplayDevice(framebuf.FrameBuffer): #, metaclass=ABCMeta):
         """Although not all displays support partial updates, this is exposed to make the interface generic."""
         pass
 
-    def ctext(self, s, x, y, c, bg=None):
-        """
-        Write text to the FrameBuffer using the the coordinates
-        as the upper-center corner of the text.
-        """
-        w = len(s) * 8
-        self.bgtext(s, x-(w//2), y, c, bg)
-
-    def bgtext(self, s, x, y, c, bg=None):
-        """
-        Write text to the FrameBuffer using the the coordinates as the upper-left corner of the text.
-        The color of the text can be defined by the optional argument but is otherwise a default value of 1.
-        All characters have dimensions of 8x8 pixels and there is currently no way to change the font.
-        """
-        if bg:
-            w = len(s) * 8
-            h = 8
-            self.rect(x, y, w, h, bg, True)
-        self.text(s, x, y, c)
+    def clear(self):
+        # Clear the display
+        upylog.trace('[DisplayDevice.clear]')
+        self.fill(self.palette.WHITE)

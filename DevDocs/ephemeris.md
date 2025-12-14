@@ -1,9 +1,9 @@
-Ephemeris
+# Ephemeris
 
 To calculate the positions of the planets, the marsclock uses the approximations from E.M. Standish and J.G. Williams in their 1992 paper.
 The values are reproduced here with details of how to use them:  
 
-https://ssd.jpl.nasa.gov/planets/approx_pos.html
+  - https://ssd.jpl.nasa.gov/planets/approx_pos.html
 
 The JPL definitions do not include examples of to implement this in code and so it has been a process of trial and error. Code examples from the following resources were incredibly helpful for understanding how to implement the solution:
 

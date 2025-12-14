@@ -10,7 +10,21 @@ class Angle:
     An object to wrap the concept of an Angle. Values given in degrees or radians are stored as such
     and only converted when requested. Hours, minutes, and seconds are stored as degrees.
     """
-    def __init__(self, deg=None, rad=None, hr=None, mins=None, sec=None, symbol=None, description=None):
+    def __init__(self, deg=None, rad=None,
+                 hr=None, mins=None, sec=None,
+                 symbol=None,
+                 description=None):
+        """
+
+        Args:
+            deg: float|None,
+            rad: float|None,
+            hr: float|None,
+            mins: float|None,
+            sec: float|None,
+            symbol: str|None,
+            description: str|None,
+        """
         not_none = [v for v in [deg, rad, hr, mins, sec] if v is not None]
         if len(not_none) == 0:
             raise ValueError("No value given")
@@ -54,15 +68,26 @@ class Angle:
 
     @property
     def deg_180(self):
+        # Get degrees on a -180 to 180 scale
         return anglehelpers.modulo_degrees_180(self.deg)
 
     @property
     def deg_360(self):
+        # Get degrees on a 0 to 360 scale
         return anglehelpers.modulo_degrees_360(self.deg)
 
     @property
     def rad_tau(self):
+        # Get radians on a 0 to tau scale
         return anglehelpers.modulo_radians_tau(self.rad)
+
+    @property
+    def time(self):
+        return anglehelpers.deg_2_time(self.deg)
+
+    @property
+    def sexagesimal(self):
+        return anglehelpers.deg_2_time(self.deg)
 
     @property
     def symbol(self):
@@ -73,7 +98,7 @@ class Angle:
         return self._description
 
     def __str__(self):
-        return f"Angle(deg={self.deg:.5f}, rad={self.rad:.5f})"
+        return f"Angle(deg={self.deg:.5f}, rad={self.rad:.5f}, time={self.time[0]:02d}:{self.time[1]:02d}:{self.time[2]:.2f})"
 
     def describe(self):
         return ', '.join([

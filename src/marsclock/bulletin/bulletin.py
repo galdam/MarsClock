@@ -1,5 +1,5 @@
 from marsclock.astro import astrotime
-from marsclock.mathutils import MetaRand
+from marsclock.helpers.math.random import MetaRand
 from marsclock.bulletin import bulletinhelpers as helpers
 
 
@@ -21,9 +21,14 @@ class BulletinFetcher:
         for msg_file, formatters in zip(self.dated_bulletin_files, self.dated_bulletin_formatters):
             with open(msg_file) as fh:
                 for l in fh:
-                    if not l:
+                    l = l.strip('\n')
+                    if not l or l.startswith('#'):
                         continue
-                    earth_event_date, mars_event_date, msg = l.strip('\n').split('\t', 2)
+                    try:
+                        earth_event_date, mars_event_date, msg = l.split('\t', 2)
+                    except Exception as err:
+                        print(l)
+                        raise err
                     unpacked = helpers.unpack_dates(earth_event_date, mars_event_date)
                     if mtd == unpacked[1][1]:
                         messages.append(formatters[1](unpacked, earth_date_now, mars_date_now, msg))

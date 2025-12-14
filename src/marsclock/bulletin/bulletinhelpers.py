@@ -37,14 +37,23 @@ def format_mars_event(unpacked, earth_date_now, mars_date_now, msg):
 
 def extract_line(file, line_num):
     with open(file, 'r') as fh:
-        for i, l in enumerate(fh):
+        i = 0
+        for l in fh:
+            l = l.strip('\n')
+            if not l or l.startswith('#'):
+                continue
             if i == line_num:
-                return l.strip('\n')
+                return l
+            i += 1
 
 
 def count_lines(file):
     with open(file, 'r') as fh:
-        for i, l in enumerate(fh):
-            pass
+        i = 0
+        for l in fh:
+            l = l.strip('\n')
+            if not l or l.startswith('#'):
+                continue
+            i += 1
         return i
 

@@ -1,5 +1,8 @@
-import math
+import marsclock.helpers.math.mathplus as math
 from marsclock.astro.astrotime import EarthDateTime
+
+
+
 
 
 def _ts2human(ts) -> str:
@@ -11,10 +14,26 @@ def _ts2human(ts) -> str:
 
 
 def j2ts(j):
+    """
+
+    Args:
+        j:
+
+    Returns:
+
+    """
     return (j - 2440587.5) * 86400
 
 
 def ts2j(ts) -> float:
+    """
+
+    Args:
+        ts:
+
+    Returns:
+
+    """
     return ts / 86400.0 + 2440587.5
 
 
@@ -33,16 +52,15 @@ def _deg2human(deg):
 
 planetary_data = {
     'Earth': {
-        'anomaly_spoch': 357.5291,
+        'anomaly_epoch': 357.5291,
         'angular_speed': 0.98560028,
-
     },
     'Mars': {
         'anomaly_epoch': 19.3871,
         'angular_speed': 0.52402073,
-
     }
 }
+
 
 
 
@@ -80,6 +98,7 @@ def calc_sunsetrise(julian_days, latitude, longitude, elevation=0.0, debug=False
                  - math.sin(math.radians(latitude)) * declination_sin)
                 / (math.cos(math.radians(latitude)) * declination_cos))
 
+
     if debug:
         print(f'Latitude               f       = {_deg2human(latitude)}')
         print(f'Longitude              l_w     = {_deg2human(longitude)}')
@@ -92,6 +111,7 @@ def calc_sunsetrise(julian_days, latitude, longitude, elevation=0.0, debug=False
         print(f'Ecliptic longitude     L       = {_deg2human(ecliptic_deg)}')
         print(f'Solar transit time     J_trans = {_j2human(solar_transit)}')
 
+
     # Value error occurs if the sun does not cross the horizon on the given day.
     try:
         w0_radians = math.acos(some_cos)
@@ -102,6 +122,7 @@ def calc_sunsetrise(julian_days, latitude, longitude, elevation=0.0, debug=False
     j_rise = (solar_transit - w0_degrees / 360)
     j_set = (solar_transit + w0_degrees / 360)
 
+
     if debug:
         print(f'Hour angle             w0      = {_deg2human(w0_degrees)}')
         print(f'Sunrise                j_rise  = {_j2human(j_rise)}')
@@ -110,8 +131,6 @@ def calc_sunsetrise(julian_days, latitude, longitude, elevation=0.0, debug=False
         dl_min = 60 * (dl_h % 1)
         dl_sec = 60 * (dl_min % 1)
         print(f'Day length                       {math.floor(dl_h)} : {math.floor(dl_min)} : {math.floor(dl_sec)}')
-
-
 
     return j_rise, j_set
 
@@ -128,6 +147,7 @@ def epoch_days_to_sun_times(latitude, longitude, epoch_days, tm_tzone, tm_dst):
     sr, ss = calc_sunsetrise(epoch_days-1, latitude, longitude, elevation=0)
     return [(julian_timestamp_to_earthtime(sr, tm_tzone, tm_dst), 'sunrise'),
             (julian_timestamp_to_earthtime(ss, tm_tzone, tm_dst), 'sunset')]
+
 
 
 def next_suntimes(et, latitude, longitude):

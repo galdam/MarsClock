@@ -17,7 +17,7 @@ https://github.com/waveshareteam/e-Paper/blob/master/RaspberryPi_JetsonNano/pyth
 """
 
 from upydrivers.display.epaper.icdevice import TriColorDevice
-
+from upydrivers import upylog
 
 class DisplayDevice(TriColorDevice):
     _name = "epd_UC8276_400x300_KWC"
@@ -28,32 +28,33 @@ class DisplayDevice(TriColorDevice):
                          rotation=rotation, **kwargs)
 
     def _send_initialise_configuration_commands(self):
+        upylog.trace('DisplayDevice._send_initialise_configuration_commands')
+
         # 7. Booster Soft Start (BTST)
-        #self._send_command(0x06, b"\x17\x17\x17")
+        #self._send_command(b'\x06', b"\x17\x17\x17")
 
         # 2. Power Setting (PWR)
-        #self._send_command(0x01, b"\x03\x00\x26\x26\x03")  # Default
-        # self._send_command(0x01, b"\x03\x00\x2b\x2b\x09")  # Wav reference doc
+        #self._send_command(b'\x01', b"\x03\x00\x26\x26\x03")  # Default
+        # self._send_command(b'\x01', b"\x03\x00\x2b\x2b\x09")  # Wav reference doc
 
         # 5. Power ON (PON)
-        self._send_command(0x04)  # POWER ON
-        self._sleep_ms(100)
-        self._wait_until_ready()
+        self._send_command(b'\x04')  # POWER ON
+        self._wait_until_ready(100)
 
         # 1. PANEL SETTING (PSR)
         # Load the default settings
-        self._send_command(0x00, b"\x0F")
+        self._send_command(b'\x00', b"\x0F\x0D")
 
         # 33. Resolution setting (TRES)
-        # self._send_command(0x61, b"\x03\x20\x01\xE0")  # 800 x 480
+        # self._send_command(b'\x61', b"\x03\x20\x01\xE0")  # 800 x 480
         # (WIDTH // 256), (WIDTH % 256), (HEIGHT // 256), (HEIGHT % 256)
         # Default resolution is 800 x 600, # Todo - check this
 
         # 13. DUAL SPI MODE (DUSPI)
-        # self._send_command(0x15, b"\x00")
+        # self._send_command(b'\x15', b"\x00")
 
         # 18. VCOM and data interval setting (CDI)
-        self._send_command(0x50, b"\xf7")
+        # self._send_command(b'\x50', b"\xf7")
 
         # 32. TCON SETTING (TCON)
         # This command defines non-overlap period of Gate and Source.
@@ -67,16 +68,17 @@ class DisplayDevice(TriColorDevice):
 
     def _send_refresh_commands(self):
         # TODO verify these! I think I copied these from a BW display
-        refresh_commands = [
-            (0x04,),  # C5: PON (Power on)
-            (0x12,),  # C11: DRF (Display Refresh)
-            (0x50, b"\xf7"), # 18: VCOM and data interval setting (CDI)
-            (0x02,),  # C3: POF (Power Off)
-        ]
-        self._send_commands(refresh_commands)
+        self._send_command(b"\x04",)   # C5: PON (Power on)
+        self._wait_until_ready(100)
+
+        self._send_command(b"\x12",)  # C11: DRF (Display Refresh)
+        self._wait_until_ready(100)
+
+        # self._send_command(b"\x50", b"\xf7") # Vcom and data interval setting (CDI)
+        self._send_command(b"\x02",)  # C3: POF (Power Off)
 
     def _deep_sleep(self):
-        raise NotImplementedError()
+        upylog.trace('[DisplayDevice._deep_sleep]')    
         self._send_command(b"\x07", b"\xa5")
         self.is_initialised = False
 

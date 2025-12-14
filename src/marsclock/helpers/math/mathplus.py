@@ -3,8 +3,12 @@ from math import *
 # Expand micropython math to include tau
 try:
     __ = tau
-except AttributeError as err:
+    __ = hypot(2,2)
+except (AttributeError, NameError) as err:
     tau = pi * 2
+
+    def hypot(x, y):
+        return sqrt(x*x + y*y)
 
 
 def cubic_equation(a, c, d):
@@ -15,7 +19,6 @@ def cubic_equation(a, c, d):
     q = d/a
     k = sqrt( q**2/4 + p**3/27 )
     return cbrt(-q/2 - k) + cbrt(-q/2 + k)
-
 
 def cbrt(x):
     # https://stackoverflow.com/questions/28014241/how-to-find-cube-root-using-python

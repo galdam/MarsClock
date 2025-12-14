@@ -5,6 +5,17 @@ Glossary:
 - Source and Gate: Gate drivers are arranged along the vertical axis, one on each row. Gates are triggered one at a time. The source drivers are arranged along the horizontal axis, one for each column of pixels. Source drivers are activated at the same time.
 - LUT : Look up table.
 - Booster : the supply of charge. Should be powered off between screen refreshes.
+ - Booster & Regulator: Stores charge
+ - Source Driver : sends signal down the columns
+ - Gate driver : sends signal along the rows
+ - OTP: One time program, preset memory
+ - LUT: Lookup table of patterns
+ - VCOM: Voltage across the front of the screen.
+ - Frame  Memory: the SRAM where the graphics are stored.
+ VCI: Power input pin for the chip.
+ SPI: serial peripheral interface
+ MCU: microcontroller
+ POR: Power-on reset, the default status
 
 
 See this article for a high level introduction to the gate/source:
@@ -16,17 +27,10 @@ For how these voltage differentials result in eink pixels changing color, see:
 In short, for each pixel, the lookup table is consulted for the pattern of voltages that will result in the correct particles rising to the top: the positively charged black or the negatively charged white. There are also big positively charged red particles that can be shown by pulling the black and red up and then pull the black bits down again. Because they're smaller, they're easier to move and the red stay at the top. This is also why black/white partial refreshes are possible but not red.
 
 For more on LUTs, see:
--https://github.com/olikraus/u8g2/issues/1393
+- https://github.com/olikraus/u8g2/issues/1393
 
 Most of the GooDisplay and WaveShare screens use an UltraChip all-in-one IC with timing control. The drivers are fairly similar at an overview with many of the same elements and commands.
 
-Booster & Regulator: Stores charge
-Source Driver : sends signal down the columns
-Gate driver : sends signal along the rows
-OTP: One time program, preset memory
-LUT: Lookup table of patterns
-VCOM: Voltage across the front of the screen.
-Frame  Memory: the SRAM where the graphics are stored.
 
 LUT data is picked for the pixel color that is being changed too and from, and for the current temperature.
 

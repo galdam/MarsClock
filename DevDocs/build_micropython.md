@@ -2,8 +2,8 @@
 # Building MicroPython
 
 Whilst testing the clock with H:M:S display, I found that the martian time wasn't updating.
-Testing the code in python3.10, everything worked fine.
-I think it comes down to the float precision, MicroPython uses single precision floats by default whist python proper uses double.
+Testing the code in python v3.10, everything worked fine.
+In the end, it comes down to float precision: MicroPython uses single precision floats by default whist python proper uses double.
 This can be changed when uP is built, documentation here is how I did it.
 
 
@@ -75,7 +75,8 @@ git checkout tags/v1.21.0
 git submodule update --init
 ```
 
-I'm not sure why I did this - I think it's for building a unix version that I don't need
+
+Skipped for rebuilding 1.26: I'm not sure why I did this - I think it's for building a unix version that I don't need
 ```
 cd micropython/ports/unix
 make submodules
@@ -83,7 +84,7 @@ make deplibs
 ```
 This last step fails `make axtls`
 
-Setup something?
+Skipped for rebuilding 1.26: Setup something?
 ```
 cd micropython
 make -C mpy-cross
@@ -91,13 +92,13 @@ make -C mpy-cross
 
 Make a double precision version for pico
 ```
-cd micropython/ports
+cd micropython
 cp -r ports/rp2 ports/rp2double
 
 make -C ports/rp2double submodules
 
 # vi ports/rp2double/mpconfigport.h
-# replace:
+# under "// Python internal features" replace:
 # >> #define MICROPY_FLOAT_IMPL                      (MICROPY_FLOAT_IMPL_FLOAT)
 # with:
 # << #define MICROPY_FLOAT_IMPL                      (MICROPY_FLOAT_IMPL_DOUBLE)
@@ -108,9 +109,24 @@ cd ports/rp2double/build
 
 cmake ..
 make
+
+
+
 ```
 
-I also saw this but never ran it:
+
+```
+make BOARD=RPI_PICO2_W submodules
+make BOARD=RPI_PICO2_W clean
+make BOARD=RPI_PICO2_W
+
+
+
+make BOARD=RPI_PICO2_W submodules
+cmake -DMICROPY_BOARD=RPI_PICO2_W ..
+```
+
+Build pictool:
 ```
   cd micropython/ports/rp2
   make -j4
@@ -119,6 +135,7 @@ I also saw this but never ran it:
 
 It seems to have worked:
 ```
+$ cd micropython/ports/rp2double/build
 $ picotool info -a firmware.uf2
 File firmware.uf2:
 

@@ -1,51 +1,80 @@
-
-from marsclock.bulletin.bulletin import BulletinFetcher
-from marsclock.widget.constellation import ConstellationWidget
-from marsclock.mathutils import MetaRand
-from marsclock.widget.moonphase import MoonPhaseWidget
-from marsclock.astro.astrotime import next_date_occurrence
 import re
 
-facts_file = 'resources/content/facts.tsv'
-bdays_file = 'resources/content/birthdays.tsv'
-events_file = 'resources/content/events.tsv'
+from marsclock.bulletin.bulletin import BulletinFetcher
+from marsclock.widget.asterism import AsterismWidget
+from marsclock.widget.moonphase import MoonPhaseWidget
+from marsclock.widget.symbol import SymbolWidget
+from marsclock.helpers.math.random import MetaRand
+from marsclock.astro.astrotime import next_date_occurrence
+from marsclock.widget.abswidget import AbsWidget
 
-CK = 0
-CW = 1
+from marsclock.config import RESOURCE_PATH
+
+#resource_dir=os.path.join(os.path.dirname(__file__), '..', '..' , 'resources', 'content')
+
+facts_file = '/'.join([RESOURCE_PATH, 'content','facts.tsv'])
+bdays_file = '/'.join([RESOURCE_PATH, 'content', 'birthdays.tsv'])
+events_file = '/'.join([RESOURCE_PATH, 'content', 'events.tsv'])
 
 
-class BulletinWidget:
-    def __init__(self, display, size, position, min_bulletins=2):
-        self.display = display
-        self.epd = display.epd
+class BulletinWidget(AbsWidget):
+
+    @property
+    def minimum_size(self) -> tuple[int, int]:
+        """
+        Returns: (int, int), width, height,
+        """
+        return 400,200
+
+    def __init__(self, hardware, position, size, min_bulletins=2):
+        super().__init__(hardware, position, size)
+        self.colors.add_color('BG', 'WHITE')
+        self.colors.add_color('TEXT', 'BLACK')
+        self.colors.add_color('LINE', 'RED')
+
         self.bulletin_fetcher = BulletinFetcher(bdays_file, events_file, facts_file)
-        self.constellation_widget = ConstellationWidget(self.display, 0, position=(15, 85))
         self.min_bulletins = min_bulletins
         self.char_width = 8
         self.char_height = 8
         self.line_height = 10
 
-        self.line_length = (400-(16*2)) // self.char_width
+        self.line_length = (self.width-(16*2)) // self.char_width
         self.message_formatter = setup_message_formatter(self.line_length, a_indent_str='', b_indent_str='')
         self.bulletins = None
 
-    def draw(self):
-        self.bulletins = self.prepare_bulletins()
+    @property
+    def _has_update(self):
+        if ((not self.hardware.rtc.earth_time_mask.tm_hour) 
+                or (not self.hardware.rtc.mars_time_mask.tm_hour)
+                or (self.bulletins is None)):
+            return 2
+        return 0
+
+    def _draw_full(self):
+        if ((not self.hardware.rtc.earth_time_mask.tm_hour) 
+                or (not self.hardware.rtc.mars_time_mask.tm_hour)
+                or (self.bulletins is None)):
+            # Clear existing subwidgets
+            self._subwidgets = []
+            # Load new bulletins
+            self.bulletins = self.prepare_bulletins()
+            if not self.bulletins:
+                # If there are no bulletins, load the asterism widget
+                self.add_subwidget(AsterismWidget(self.hardware, self.position, self.size, ))
+        
         if self.bulletins:
             self.draw_bulletins(self.bulletins)
-        else:
-            self.constellation_widget.draw()
 
     def prepare_bulletins(self):
         # Load dated bulletins
         bulletins = self.bulletin_fetcher.collect_dated_bulletins(
-            self.display.earth_time, self.display.mars_time)
+            self.hardware.rtc.earth_time, self.hardware.rtc.mars_time)
 
         # If there are no dated bulletins, consider displaying constellations
         # Always consume a rand digit here to keep the clocks in sync
-        show_constellations = MetaRand.rand_int(20) == 0
+        show_constellations = MetaRand.rand_int(15) == 0
         if not bulletins and show_constellations:
-            return
+            return []
 
         if len(bulletins) < self.min_bulletins:
             bulletins.extend(
@@ -58,7 +87,7 @@ class BulletinWidget:
         bulletins = [[self.message_formatter(msg), w] for msg, w in bulletins]
         n_lines = sum(len(b[0]) for b in bulletins)
         n_para = len(bulletins)
-        y_start = 82
+        y_start = self.y
         ltext = 16
         height = (300 - 10) - y_start
 
@@ -70,7 +99,7 @@ class BulletinWidget:
                 widget_loc = None
                 if embedded_widget:
                     line, widget_loc = EmbeddedWidget.widget_loc(line)
-                self.epd.text(line, ltext, pos, CK)
+                self.display.text(line, ltext, pos, self.colors['TEXT'])
                 if widget_loc:
                     self.apply_widget(x=((widget_loc-1)*self.char_width)+ltext,
                                       y=pos,
@@ -78,14 +107,23 @@ class BulletinWidget:
                 pos += self.line_height
             pos += wspace
             if b_num < len(bulletins) -1:
-                self.epd.line(200 - 30, pos, 200 + 30, pos, CK)
+                self.display.line(200 - 30, pos, 200 + 30, pos, self.colors['LINE'])
 
     def apply_widget(self, x, y, w):
         widget, params = w.split(':', 1)
+
         if widget == 'MP':
             __, target_mon, target_mday = params.split('-')
-            dt = next_date_occurrence(self.display.earth_time, int(target_mon), int(target_mday))
-            MoonPhaseWidget(self.display, self.char_width, (x, y)).draw_moon_by_date(dt)
+            dt = next_date_occurrence(self.hardware.rtc.earth_time, int(target_mon), int(target_mday))
+            widg = MoonPhaseWidget(self.hardware, (x, y), (self.char_width, self.char_height), outer=True, earth_time=dt )
+            widg._draw_full()
+
+        elif widget == 'SY':
+            symbol = params
+            widg = SymbolWidget(self.hardware, (x, y), (self.char_width, self.char_height),
+                                 symbol, draw_bg=True)
+            widg._draw_full()
+
         else:
             raise NotImplementedError(f"No widget for: {widget}")
 
@@ -96,6 +134,7 @@ class EmbeddedWidget:
 
     widget_placeholder_sizes = {
         'MP': 1,
+        'SY': 1, 
     }
 
     @classmethod

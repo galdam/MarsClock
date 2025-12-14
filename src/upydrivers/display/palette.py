@@ -14,25 +14,35 @@ class AbsPalette(): #ABC):
     def __init__(self):
         pass
 
+    # @abstractmethod
     @staticmethod
-    #@abstractmethod
-    def rgb(r, g, b):
+    def rgb(r: int, g: int, b: int) -> int:
+        """
+        Converts an RGB value to the appropriate value for current palette
+        Args:
+            r: int, red value (0-255)
+            g: int, green value (0-255)
+            b: int, blue value (0-255)
+        Returns:
+            int, an approximation for this color as appropriate for this palette
+        """
         raise NotImplementedError()
 
+
+    # @abstractmethod
     @property
-    #@abstractmethod
     def ncolors(self):
         raise NotImplementedError()
 
+    # @abstractmethod
     @property
-    #@abstractmethod
     def nbits(self):
         raise NotImplementedError()
 
     def color(self, name):
         try:
             return getattr(self, name.upper())
-        except AttributeError():
+        except AttributeError:
             return None
 
     @property
@@ -75,6 +85,9 @@ class AbsPalette(): #ABC):
 
 
 class PaletteMono(AbsPalette):
+    """
+    Palette for a black/white screen where 0 is black and 1 is white
+    """
     @property
     def ncolors(self):
         return 2
@@ -93,7 +106,7 @@ class PaletteTricolor(AbsPalette):
     """
     Tricolor screens are generally black, white and an additional color (popular options are red or yellow).
     This palette assumes all shades other than B/W should be rendered in the third color.
-    White:3, Colour: 2, Black: 1. 0 is not used.
+    White: 3, Colour: 2, Black: 1. 0 is not used.
     """
     @property
     def ncolors(self):

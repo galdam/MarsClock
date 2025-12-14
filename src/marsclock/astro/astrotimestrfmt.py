@@ -35,13 +35,35 @@ class StrFmtTime:
 class DateTimeAttributes:
     """
     A wrapper class that takes an AstroDateTime and exposes the strftime directives as attributes.
+
+    a: Locale's three letter abbreviated weekday name
+    A: Locale's full weekday name
+    b: Locale's three letter abbreviated month name
+    B: Locale's full month name
+    d: Day of the month as a decimal number [01,31]
+    H: Hour (24-hour clock) as a decimal number [00,23]
+    I: Hour (12-hour clock) as a decimal number [01,12]
+    j: Day of the year as a decimal number [001,366]
+    m: Month as a decimal number [01,12]
+    M: Minute as a decimal number [00,59]
+    p: Locale's equivalent of either AM or PM
+    S: Second as a decimal number [00,61]
+    z: Time zone offset indicating a positive or negative time difference
+        from UTC/GMT of the form +HHMM or -HHMM, where H represents decimal
+        hour digits and M represents decimal minute digits [-23:59, +23:59]
+    w: Weekday as a decimal number [0(Sunday),6]
+    U: Week number of the year (Sunday as the first day of the week) as a decimal number [00,53].
+        All days in a new year preceding the first Sunday are considered to be in week 0.
+    Y: Year with century as a decimal number
+    x: Locale's appropriate date representation (Y/m/d)
+    X: Locale's appropriate time representation (H:M)
     """
     def __init__(self, dt):
         self.dt = dt
 
     @property
     def a(self):
-        # Locale's abbreviated weekday name
+        # Locale's three letter abbreviated weekday name
         return self.dt.weekday_name(self.dt.tm_wday, abrv=True)
 
     @property
@@ -51,7 +73,7 @@ class DateTimeAttributes:
 
     @property
     def b(self):
-        # Locale's abbreviated month name
+        # Locale's three letter abbreviated month name
         return self.dt.month_name(self.dt.tm_mon, abrv=True)
 
     @property

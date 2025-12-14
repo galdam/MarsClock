@@ -66,10 +66,10 @@ class DisplayDevice(PartialUpdateMixin, QuadGreyscaleDevice):
 
         # 2. Power Setting (PWR)
         self._send_command(b"\x01", b"\x03\x00\x2b\x2b\x09")  # Default
-        # self._send_command(0x01, b"\x03\x00\x2b\x2b\x09")  # Wav reference doc
+        # self._send_command(b'\x01', b"\x03\x00\x2b\x2b\x09")  # Wav reference doc
 
         # 5. Power ON (PON)
-        self._send_command(b"\0x04")  # POWER ON
+        self._send_command(b"\x04")  # POWER ON
         self._wait_until_ready(100)
 
         # 1. PANEL SETTING (PSR)

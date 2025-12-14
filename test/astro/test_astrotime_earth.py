@@ -1,5 +1,28 @@
 import pytest
-from marsclock.astro.astrotime import EarthDateTime, is_bst
+from marsclock.astro.astrotime import EarthDateTime, is_euro_summertime
+
+HOUR = 60*60
+
+
+def test_initiate_epoch_time():
+    ed = EarthDateTime(None, None, None, 0, 0, 0)
+    assert ed.to_tuple() == (2000, 1, 1, 0, 0, 0)
+
+
+@pytest.mark.parametrize("tzone,exp_tuple,exp_tzone,exp_offset", [
+    ['UTC',   (2000, 1, 1, 0, 0, 0),    'UTC', 0],
+    ['GMT',   (2000, 1, 1, 0, 0, 0),    'GMT', 0],
+    ['CET',   (2000, 1, 1, 1, 0, 0),    'CET', HOUR],
+    [HOUR,    (2000, 1, 1, 1, 0, 0),    'UTC+01', HOUR],
+    [-1*HOUR, (1999, 12, 31, 23, 0, 0), 'UTC-01', -1*HOUR],
+])
+def test_initiate_time_w_tmzone(tzone, exp_tuple, exp_tzone, exp_offset):
+    ed = EarthDateTime(None, None, None, 0, 0, 0, tzone)
+    assert ed.to_tuple() == exp_tuple
+    assert ed.tm_tzone == exp_tzone
+    assert ed.tm_tzone_offset == exp_offset
+
+
 
 
 @pytest.mark.parametrize("year", [
@@ -29,7 +52,7 @@ def test_week_day(year, month, mday, expected):
 
 def test_number_of_months_in_year():
     assert EarthDateTime._months_in_year() == len(EarthDateTime._days_in_months())
-
+    assert EarthDateTime._months_in_year() == 12
 
 @pytest.mark.parametrize("year,month,weekday,expected", [
     [2024, 1, 3, 25], [2024, 1, 4, 26], [2024, 1, 5, 27],
@@ -51,8 +74,8 @@ def test_last_day_of_week(year, month, weekday, expected):
     [(2026, 3, 29, 0, 59, 0), False], [(2026, 3, 29, 1, 0, 0), True],
     [(2026, 10, 25, 0, 59, 0), True], [(2026, 10, 25, 1, 0, 0), False],
 ])
-def test_is_bst(time_tup, expected):
-    assert is_bst(EarthDateTime(*time_tup, tm_dst=0)) == expected
+def test_is_euro_summertime_GMT(time_tup, expected):
+    assert is_euro_summertime(EarthDateTime(*time_tup, tm_tzone='GMT', tm_dst=None)) == expected
 
 
 @pytest.mark.parametrize("time_tup,expected", [
@@ -63,5 +86,5 @@ def test_is_bst(time_tup, expected):
     [(2026, 3, 29, 1, 59, 0), False], [(2026, 3, 29, 2, 0, 0), True],
     [(2026, 10, 25, 1, 59, 0), True], [(2026, 10, 25, 2, 0, 0), False],
 ])
-def test_is_bst_cet(time_tup, expected):
-    assert is_bst(EarthDateTime(*time_tup, tm_tzone='CET', tm_dst=0)) == expected
+def test_is_euro_summertime_CET(time_tup, expected):
+    assert is_euro_summertime(EarthDateTime(*time_tup, tm_tzone='CET', tm_dst=None)) == expected

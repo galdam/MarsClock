@@ -1,10 +1,31 @@
 import math
+from upydrivers import upylog
+
 # TODO Clean this up, look at using the micropython native functions
 
 
+def msb_iterator(buffer, width, height, rotation, deinterlace):
+    byte = 0
+    bit_count = 0
+    for x, y in pixel_location_iterator(width, height, rotation):
+        pix = get_msb_pixel(buffer, x, y, width)
+        bit = pix >> deinterlace & 1
+        byte |= (bit << bit_count)
+
+        if bit_count == 7:
+            yield byte
+            byte = 0
+            bit_count = 0
+        else:
+            bit_count += 1
+    if bit_count != 0:
+        yield byte
+
+
 def deinterlace_bytearray(src_bytearray, byteix, inverse=False):
+    upylog.trace('[byteops.deinterlace_bytearray]')
     for i in range(0, len(src_bytearray), 2):
-        yield deinterlace_bytepair(src_bytearray[i:i+1], byteix, inverse)
+        yield deinterlace_bytepair(src_bytearray[i:i+2], byteix, inverse)
 
 
 def deinterlace_bytepair(src_bytes, byteix, inverse=False):
@@ -26,7 +47,7 @@ def deinterlace_bytepair(src_bytes, byteix, inverse=False):
     dst_byte = dst_byte >> 1
     if not inverse:
         dst_byte = dst_byte ^ 0xFF
-    return dst_byte
+    return rbit8(dst_byte)
 
 
 def rotate_bytearray_clockwise(src_bytearray, width, height):
@@ -67,17 +88,49 @@ def rotate_bytearray_anticlockwise(src_bytearray, width, height):
 
 def rotate_msb_bytearray(src_bytearray, width, height, rotation):
     if rotation == 0:
+        upylog.trace('[byteops.rotate_msb_bytearray] Rotation 0, reversing MSB to LSB')
         for b in src_bytearray:
             yield rbit8(b)
     elif rotation == 1:
+        upylog.trace('[byteops.rotate_msb_bytearray] Rotation 1, rotate_bytearray_clockwise')
         for b in rotate_bytearray_clockwise(src_bytearray, width, height):
             yield b
     elif rotation == 2:
+        upylog.trace('[byteops.rotate_msb_bytearray] Rotation 2, returning bytes in reverse, MSB inherently becomes LSB')
         for b in reversed(src_bytearray):
             yield b
     elif rotation == 3:
+        upylog.trace('[byteops.rotate_msb_bytearray] Rotation 3, rotate_bytearray_anticlockwise')
         for b in rotate_bytearray_anticlockwise(src_bytearray, width, height):
             yield rbit8(b)
+
+
+def pixel_location_iterator(width, height, rotation=0):
+    if rotation == 0:
+        for y in range(height):
+            for x in range(width):
+                yield x, y
+    elif rotation == 1:
+        for x in range(width-1, -1, -1):
+            for y in range(height):
+                yield x, y
+    elif rotation == 2:
+        for y in range(height-1, -1, -1):
+            for x in range(width-1, -1, -1):
+                yield x, y
+    elif rotation == 3:
+        for x in range(width):
+            for y in range(height-1, -1, -1):
+                yield x, y
+                
+
+def get_msb_pixel(buffer_arr, x, y, width):
+    """Get the color of a given pixel"""
+    pixel_num = (y * width + x)
+    index = pixel_num >> 2
+    pixel = buffer_arr[index]
+    shift = (pixel_num & 0b11) << 1
+    return (pixel >> shift) & 0b11
 
 
 # Bit reverse an 8 bit value

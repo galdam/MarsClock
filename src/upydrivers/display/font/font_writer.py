@@ -20,8 +20,10 @@
 # 20 pixel high font, timings were 5.44ms/467μs, gain 11.7 (freesans20).
 # 10 pixel high font, timings were 1.76ms/396μs, gain 4.36 (arial10).
 
-
-import framebuf
+try:
+    import framebuf
+except ImportError:
+    from mockmicro import framebuf
 from uctypes import bytearray_at, addressof
 from sys import implementation
 
@@ -37,8 +39,8 @@ class DisplayState():
 
 
 def _get_id(device):
-    if not isinstance(device, framebuf.FrameBuffer):
-        raise ValueError('Device must be derived from FrameBuffer.')
+    #if not isinstance(device, framebuf.FrameBuffer):
+    #    raise ValueError('Device must be derived from FrameBuffer.')
     return id(device)
 
 
@@ -123,7 +125,9 @@ class Writer():
     def height(self):  # Property for consistency with device
         return self.font.height()
 
-    def printstring(self, string, invert=False):
+    def printstring(self, string, invert=False, location=None):
+        if location is not None:
+            self.set_textpos(self.device, location[1], location[0])
         # word wrapping. Assumes words separated by single space.
         q = string.split('\n')
         last = len(q) - 1

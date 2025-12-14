@@ -4,12 +4,12 @@ extended to include mars times and to use a y2k epoch :
  - https://github.com/micropython/micropython/blob/master/shared/timeutils/timeutils.c
  - https://github.com/python/cpython/blob/main/Lib/calendar.py
 """
-#from abc import ABCMeta, abstractmethod
+# from abc import ABCMeta, abstractmethod
 from collections import namedtuple
 from marsclock import config
 from marsclock.astro.load_locale import get_locale
 from marsclock.helpers.math.mathplus import c_divmod
-from marsclock.astro.strfmtastrotime import StrFmtTime
+from marsclock.astro.astrotimestrfmt import StrFmtTime
 
 
 DateTimeTup = namedtuple(
@@ -18,8 +18,8 @@ DateTimeTup = namedtuple(
      'tm_min', 'tm_sec'))
 
 MINUTE = 60
-HOUR = 60*60
-DAY = 60*60*24
+HOUR = 3600
+DAY = 86400
 
 
 class AbstractDateTime():#metaclass=ABCMeta):
@@ -28,64 +28,88 @@ class AbstractDateTime():#metaclass=ABCMeta):
     """
     __DT_TYPE__ = "AbstractDateTime"
     __LOCALE__ = None
-    __DEFAULT_TIMEZONE__ = None
+    __DEFAULT_TIMEZONE__ = None  # Default is UTC or MTC as appropriate
     __TIMEZONE_LOOKUP__ = {}
     NAMES = None
     EPOCH = (0, 1, 1)
+
 
     def __init__(self, tm_year=None, tm_mon=None, tm_mday=None, tm_hour=0, tm_min=0, tm_sec=0,
                  tm_tzone=0, tm_dst=None):
         """
         Set up with a date object. Inputs times are always UTC or MTC.
         Timezones and dst are then applied to that value.
+
+        Args:
+            tm_year: None|int,
+            tm_mon: None|int,
+            tm_mday: None|int,
+            tm_hour:
+            tm_min:
+            tm_sec:
+            tm_tzone: str|int, either the timezone code or the offset in seconds
+            tm_dst: int|None, DST offset in seconds or defer to the timezone
         """
+        # When year, month, or day are omitted, use the epoch value (2000/1/1 for Earth, 0/1/1 for Mars)
         tm_year = self.EPOCH[0] if tm_year is None else tm_year
         tm_mon = self.EPOCH[1] if tm_mon is None else tm_mon
         tm_mday = self.EPOCH[2] if tm_mday is None else tm_mday
 
+        # Verify that the month is valid
         if tm_mon and not (0 < tm_mon <= self._months_in_year()):
-            raise ValueError(
-                f"Invalid month value: {tm_mon}. Month must be in [1 .. {self._months_in_year()}].")
-        try:
-            self.tm_tzone_offset = int(tm_tzone)
-            if tm_tzone == 0:
-                self.tm_tzone = self.__DEFAULT_TIMEZONE__
-            else:
-                self.tm_tzone = f"{self.__DEFAULT_TIMEZONE__}{self.fmt_timezone(self.tm_tzone_offset)}"
-        except (ValueError, TypeError) as t_err:
-            try:
-                self.tm_tzone = tm_tzone
-                self.tm_tzone_offset = self.__TIMEZONE_LOOKUP__[tm_tzone]
-            except KeyError as k_err:
-                raise ValueError(f"Unrecognised timezone '{tm_tzone}'")
+            raise ValueError("Invalid month value: {}. Month must be in [1 .. {}].".format(tm_mon, self._months_in_year()))
 
-        self.tm_dst = tm_dst  # Number or None
-        try:
-            self.tm_dst_offset = int(tm_dst)
-        except (ValueError, TypeError) as err:
-            self.tm_dst_offset = 0
+        # Resolve the timezone
+        self.tm_tzone, self.tm_tzone_offset = self._resolve_timezone(tm_tzone)
 
-        self.tm_offset = self.tm_tzone_offset + self.tm_dst_offset
+        # Offset by cumulative timezone and DST
+        self.tm_offset = self.tm_tzone_offset  # + self.tm_dst_offset
 
         (self.tm_year, self.tm_mon, self.tm_mday,
          self.tm_hour, self.tm_min, self.tm_sec,) = self._normalise_date(
             tm_year, tm_mon, tm_mday,
             tm_hour, tm_min, tm_sec + self.tm_offset)
 
-        #self.__validate_date()
         self.__tm_wday = None
         self.__tm_yday = None
 
-    """
-    def apply_offset(self, tm_offset):
-        (self.tm_year, self.tm_mon, self.tm_mday,
-         self.tm_hour, self.tm_min, self.tm_sec,) = self._normalise_date(
-            self.tm_year, self.tm_mon, self.tm_mday,
-            self.tm_hour, self.tm_min, self.tm_sec + tm_offset)
-        self.tm_offset = tm_offset
-        self.__tm_wday = None
-        self.__tm_yday = None
-    """
+        # Resolve the daylight savings
+        self.tm_dst_offset = self._resolve_daylightsavings(tm_dst)
+        self.tm_dst = tm_dst
+        # Offset by cumulative timezone and DST
+        self.tm_offset = self.tm_tzone_offset + self.tm_dst_offset
+        # Recalculate date
+        if self.tm_dst_offset != 0:
+            (self.tm_year, self.tm_mon, self.tm_mday,
+             self.tm_hour, self.tm_min, self.tm_sec,) = self._normalise_date(
+                tm_year, tm_mon, tm_mday,
+                tm_hour, tm_min, tm_sec + self.tm_offset)
+            self.__tm_wday = None
+            self.__tm_yday = None
+
+    def _resolve_timezone(self, tm_tzone):
+        # Resolve the timezone
+        try:
+            tm_tzone_offset = int(tm_tzone)
+            if tm_tzone == 0:
+                tm_tzone_name = self.__DEFAULT_TIMEZONE__  # Timezone is UTC/MTC
+            else:
+                tm_tzone_name = f"{self.__DEFAULT_TIMEZONE__}{self.fmt_timezone(tm_tzone_offset)}"
+        except (ValueError, TypeError) as t_err:
+            try:
+                tm_tzone_name = tm_tzone
+                tm_tzone_offset = self.__TIMEZONE_LOOKUP__[tm_tzone]
+            except KeyError as k_err:
+                raise ValueError(f"Unrecognised timezone '{tm_tzone}'")
+        return tm_tzone_name, tm_tzone_offset
+
+    def _resolve_daylightsavings(self, tm_dst):
+        # Resolve the daylight savings
+        try:
+            tm_dst_offset = int(tm_dst)
+        except (ValueError, TypeError):
+            tm_dst_offset = 0
+        return tm_dst_offset
 
     def __repr__(self):
         tm_year, tm_mon, tm_mday = self.tm_year, self.tm_mon, self.tm_mday
@@ -212,7 +236,7 @@ class AbstractDateTime():#metaclass=ABCMeta):
 
     @classmethod
     def fmt_offset(cls, offset):
-        h = abs(offset) // 3600
+        h = abs(offset) // HOUR
         m = (abs(offset) // 60) % 60
         s = (abs(offset) % 60)
         sstr = '' if s == 0 else f".{s:02d}"
@@ -222,27 +246,24 @@ class AbstractDateTime():#metaclass=ABCMeta):
     def fmt_timezone(cls, offset):
         if offset == 0:
             return ''
-        h = abs(offset) // 3600
+        h = abs(offset) // HOUR
         m = (abs(offset) // 60) % 60
         s = (abs(offset) % 60)
         return "".join([
-            f"{'-' if offset < 0 else '+'}{h:d}",
+            f"{'-' if offset < 0 else '+'}{h:02d}",
             '' if (s == 0 and m == 0) else f":{m:02d}",
             '' if s == 0 else f".{s:02d}",
         ])
 
     @classmethod
-    #@abstractmethod
     def _calc_weekday(cls, year, month, mday):
         raise NotImplementedError()
 
     @classmethod
-    #@abstractmethod
     def _is_leap_year(cls, year):
         raise NotImplementedError()
 
     @classmethod
-    #@abstractmethod
     def _days_in_months(cls, year=None):
         raise NotImplementedError()
 
@@ -251,7 +272,6 @@ class AbstractDateTime():#metaclass=ABCMeta):
         return cls._days_in_months(year)[month-1]
 
     @classmethod
-    #@abstractmethod
     def _months_in_year(cls):
         raise NotImplementedError()
 
@@ -268,7 +288,7 @@ class AbstractDateTime():#metaclass=ABCMeta):
         """
         if as_dt:
             return cls(year, month, cls.last_weekday_of_month(year, month, weekday, as_dt=False),
-                       hour, minute, second, tm_dst=0)
+                       hour, minute, second)
 
         mlens = cls._days_in_months(year=year)
         last_day = mlens[month-1]
@@ -333,24 +353,24 @@ class AbstractDateTime():#metaclass=ABCMeta):
 
     @property
     def epoch_tc_seconds(self):
-        """Seconds since the epoch. 0 indexed."""
+        """Seconds since the epoch. 0 indexed. Leap seconds are ignored."""
         return (
                 self.tm_sec
-                + (self.tm_min * 60)
-                + (self.tm_hour * 3600)
-                + ((self._intercalculate_year(self.tm_year) + self.tm_yday - 1) * 86400)
+                + (self.tm_min * MINUTE)
+                + (self.tm_hour * HOUR)
+                + ((self._intercalculate_year(self.tm_year) + self.tm_yday - 1) * DAY)
                 - (0 if self.tm_offset is None else self.tm_offset)
         )
 
     @property
     def epoch_tc_hours(self):
         """Hours since the epoch. 0 indexed """
-        return (self.epoch_tc_seconds // 3600)
+        return (self.epoch_tc_seconds // HOUR)
 
     @property
     def epoch_tc_days(self):
         """Day *of* the epoch. 1 indexed """
-        return (self.epoch_tc_seconds // 86400) + 1
+        return (self.epoch_tc_seconds // DAY) + 1
 
 
 class EarthDateTime(AbstractDateTime):
@@ -367,10 +387,10 @@ class EarthDateTime(AbstractDateTime):
         tm_year = self.EPOCH[0] if tm_year is None else tm_year
         tm_mon = self.EPOCH[1] if tm_mon is None else tm_mon
         tm_mday = self.EPOCH[2] if tm_mday is None else tm_mday
-        if tm_dst is None:
-            tm_dst = "BST"
 
         super().__init__(tm_year, tm_mon, tm_mday, tm_hour, tm_min, tm_sec, tm_tzone, tm_dst)
+
+        __foo = """
         # Default to BST calculation
         if self.tm_dst == "BST" and is_bst(self):
             self.tm_dst_offset = HOUR
@@ -380,10 +400,18 @@ class EarthDateTime(AbstractDateTime):
              self.tm_hour, self.tm_min, self.tm_sec,) = self._normalise_date(
                 tm_year, tm_mon, tm_mday,
                 tm_hour, tm_min, tm_sec+self.tm_offset)
+            """
+
+    def _resolve_daylightsavings(self, tm_dst):
+        if tm_dst is None and self.tm_tzone in ['GMT', 'CET']:
+            return HOUR if is_euro_summertime(self) else 0
+        else:
+            return super()._resolve_daylightsavings(tm_dst)
 
     @classmethod
     def _calc_weekday(cls, year, month, mday):
-        """Calculate the weekday from the date.
+        """
+        Calculate the weekday from the date.
         The result is zero based with 0 = Monday.
         by Michael Keith and Tom Craver, 1990.
         """
@@ -420,8 +448,8 @@ class EarthDateTime(AbstractDateTime):
             + ((year - cls.EPOCH[0] + 399) // 400)  # add a day each 400 years starting with 2001
         ) + (year - cls.EPOCH[0]) * 365)
 
-    def to_marstime(self, tm_tzone=0, tm_dst=None):
-        return earthdatetime_2_marsdatetime(self, tm_tzone, tm_dst)
+    def to_marstime(self):
+        return earthdatetime_2_marsdatetime(self)
 
     @property
     def j2kdelta(self):
@@ -478,53 +506,60 @@ class MarsDateTime(AbstractDateTime):
 
 def earthdatetime_2_j2kdelta_days(earthdatetime):
     """As fractional days since the Julian date 2000-1-1 12:00 GMT"""
-    return (earthdatetime.epoch_tc_seconds + (-43200 + 69.184)) / 86400
+    return (earthdatetime.epoch_tc_seconds + (-43200 + 69.184)) / DAY
+
+
+
+def j2kdelta_2_epoch_tc_seconds(j2kdelta):
+    """
+    """
+    return (j2kdelta * DAY) - (-43200 + 69.184)
 
 
 def j2kdelta_2_earthdatetime(j2kdelta):
-    return EarthDateTime(tm_sec=(j2kdelta * 86400) - (-43200 + 69.184))
+    """
+    """
+    return EarthDateTime(tm_sec=j2kdelta_2_epoch_tc_seconds(j2kdelta))
 
 
-def earthdatetime_2_mars_standard_time(earthdatetime):
+def earthdatetime_2_mars_standard_time(earthdatetime: EarthDateTime):
     """As MST"""
     j2kdelta = earthdatetime_2_j2kdelta_days(earthdatetime)
+    return j2kdelta_2_mars_standard_time(j2kdelta)
+
+def j2kdelta_2_mars_standard_time(j2kdelta):
     return ((j2kdelta - 4.5) / 1.027491252) + 44796.0 - 0.00096  # 9626e-7
 
 
-def earthdatetime_2_marsdatetime(earthdatetime, tm_tzone=0, tm_dst=None):
+def earthdatetime_2_marsdatetime(earthdatetime: EarthDateTime):
     mst = earthdatetime_2_mars_standard_time(earthdatetime)
-    return mst_to_marsdatetime(mst, tm_tzone, tm_dst)
+    return mst_2_marsdatetime(mst)
 
 
-def fracdays_2_dhms(days):
+def fracdays_2_dhms(days: float):
     days, secs = c_divmod(days, 1)
-    mins, secs = divmod(secs * 86400, 60)
+    mins, secs = divmod(secs * DAY, 60)
     hours, mins = divmod(mins, 60)
     days, hours, mins, secs = map(int, (days, hours, mins, secs))
     return days, hours, mins, secs
 
 
-def mst_to_marsdatetime(mst, tm_tzone=0, tm_dst=None):
+def mst_2_marsdatetime(mst: float):
     hour = mst % 1 * 24
     return MarsDateTime(
         tm_mday=int(mst) + 94129,
         tm_hour=int(hour),
-        tm_min=int(hour * 60.0) % 60,
-        tm_sec=int(hour * 36e2) % 60,
-        tm_tzone=tm_tzone,
-        tm_dst=tm_dst,
+        tm_min=int(hour * MINUTE) % 60,
+        tm_sec=int(hour * HOUR) % 60,
     )
 
 
-def is_bst(earth_date_time):
+def is_euro_summertime(earth_date_time):
     """
-    Determine if the given date is during british summer time.
-    The same rules apply for CET.
+    Determine if the given date is during british summer time/ CET.
     Args:
         earth_date_time:
-
     Returns:
-
     """
     # Shortcut if we're outside of March/Oct
     if earth_date_time.tm_mon not in [3, 10]:

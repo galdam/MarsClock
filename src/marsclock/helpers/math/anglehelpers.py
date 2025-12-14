@@ -45,3 +45,12 @@ def deg_2_sec(deg):
 
 def sec_2_deg(sec):
     return sec / (86400 / 360)
+
+
+def deg_2_time(degrees):
+    total_hours = degrees / 15.0
+    hours = int(total_hours)
+    minutes = int((total_hours - hours) * 60)
+    seconds = ((total_hours - hours) * 60 - minutes) * 60
+    return hours, minutes, seconds
+

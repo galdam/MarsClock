@@ -1,10 +1,9 @@
 import os
-from marsclock.mathutils import MetaRand
+from marsclock.helpers.math.random import MetaRand
 try:
     import json
 except ImportError:
     import ujson as json
-
 
 
 constellations_resource = '/resources/constellations'

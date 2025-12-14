@@ -3,7 +3,7 @@ import time
 from machine import Pin
 
 from marsclock.astro import astrotime
-from marsclock.astro.strfmtastrotime import StrFmtTime
+from marsclock.astro.astrotimestrfmt import StrFmtTime
 from marsclock.widget.solar import SolarWidget
 from marsclock.widget.bulletin import BulletinWidget
 from marsclock.widget.moonphase import MoonPhaseWidget

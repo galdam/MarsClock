@@ -6,7 +6,7 @@ _LOG_NUMS = {
     'WARN': 3
 }
 
-LOG_LEVEL = 'DEBUG'
+LOG_LEVEL = 'TRACE'
 
 
 def trace(message, *args):
@@ -22,5 +22,5 @@ def info(message, *args):
 
 
 def _log_message(log_level, message, *args):
-    if _LOG_NUMS[LOG_LEVEL] >= _LOG_NUMS[log_level]:
-        print(message % args)
+    if _LOG_NUMS[log_level] >= _LOG_NUMS[LOG_LEVEL]:
+        print(log_level, message.format(*args))
